@@ -18,4 +18,6 @@ defmodule Oli.Communities.Community do
     |> validate_required([:name])
     |> unique_constraint(:name)
   end
+
+  def list_communities, do: Repo.all(__MODULE__)
 end
