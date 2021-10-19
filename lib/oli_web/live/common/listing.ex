@@ -1,4 +1,4 @@
-defmodule OliWeb.Products.Listing do
+defmodule OliWeb.Common.Listing do
   use Surface.Component
   alias OliWeb.Common.SortableTable.Table
   alias OliWeb.Common.Paging
