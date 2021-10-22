@@ -12,7 +12,7 @@ defmodule Oli.Communities.Community do
   end
 
   @doc false
-  def changeset(community, attrs) do
+  def changeset(community, attrs \\ %{}) do
     community
     |> cast(attrs, [:name, :description, :key_contact])
     |> validate_required([:name])
@@ -20,4 +20,10 @@ defmodule Oli.Communities.Community do
   end
 
   def list_communities, do: Repo.all(__MODULE__)
+
+  def create_community(attrs \\ %{}) do
+    %__MODULE__{}
+    |> __MODULE__.changeset(attrs)
+    |> Repo.insert()
+  end
 end

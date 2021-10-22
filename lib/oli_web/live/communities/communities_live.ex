@@ -62,11 +62,17 @@ defmodule OliWeb.Communities.CommunitiesLive do
 
   def render(assigns) do
     ~F"""
-      <Filter
-        change="change_filter"
-        reset="reset_filter"
-        apply="apply_filter"
-        filter={@filter}/>
+      <div class="d-flex p-3 justify-content-between">
+        <Filter
+          change="change_filter"
+          reset="reset_filter"
+          apply="apply_filter"
+          filter={@filter}/>
+
+        <Link class="btn btn-primary" to={Routes.live_path(@socket, CreateCommunityLive)}>
+          Create Community
+        </Link>
+      </div>
 
       <div id="communities-table" class="p-4">
         <Listing
