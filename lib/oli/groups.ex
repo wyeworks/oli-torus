@@ -36,4 +36,32 @@ defmodule Oli.Groups do
     |> Community.changeset(attrs)
     |> Repo.insert()
   end
+
+  @doc """
+  Finds a community by id.
+
+  ## Examples
+
+      iex> find(1)
+      %Community{}
+      iex> find(123)
+      nil
+  """
+  def find(id), do: Repo.get(__MODULE__, id)
+
+  @doc """
+  Updates a community.
+
+  ## Examples
+
+      iex> update(community, %{name: new_value})
+      {:ok, %Community{}}
+      iex> update(community, %{name: bad_value})
+      {:error, %Ecto.Changeset{}}
+  """
+  def update(%__MODULE__{} = community, attrs) do
+    community
+    |> changeset(attrs)
+    |> Repo.update()
+  end
 end
