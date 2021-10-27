@@ -5,7 +5,7 @@ defmodule OliWeb.Communities.CommunitiesLiveTest do
   import Phoenix.LiveViewTest
   import Oli.Factory
 
-  @liveview_route "/admin/communities"
+  @liveview_route Routes.live_path(OliWeb.Endpoint, OliWeb.Communities.CommunitiesLive)
 
   describe "user cannot access when is not logged in" do
     test "redirects to new session", %{conn: conn} do

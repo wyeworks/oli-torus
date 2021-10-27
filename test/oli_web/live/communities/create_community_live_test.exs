@@ -6,7 +6,7 @@ defmodule OliWeb.Communities.CreateCommunityLiveTest do
 
   alias Oli.Communities.Community
 
-  @liveview_route "/admin/communities/new"
+  @liveview_route Routes.live_path(OliWeb.Endpoint, OliWeb.Communities.CreateCommunityLive)
 
   describe "user cannot access when is not logged in" do
     test "redirects to new session", %{conn: conn} do
