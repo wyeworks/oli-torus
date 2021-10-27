@@ -37,8 +37,8 @@ defmodule OliWeb.Communities.CommunitiesLiveTest do
     end
 
     test "loads the communities correctly", %{conn: conn} do
-      c1 = insert!(:community)
-      c2 = insert!(:community)
+      c1 = insert(:community)
+      c2 = insert(:community)
 
       {:ok, view, _html} = live(conn, @liveview_route)
 
@@ -48,8 +48,8 @@ defmodule OliWeb.Communities.CommunitiesLiveTest do
     end
 
     test "can apply filtering", %{conn: conn} do
-      c1 = insert!(:community, %{name: "Testing"})
-      c2 = insert!(:community)
+      c1 = insert(:community, %{name: "Testing"})
+      c2 = insert(:community)
 
       {:ok, view, _html} = live(conn, @liveview_route)
 
@@ -73,8 +73,8 @@ defmodule OliWeb.Communities.CommunitiesLiveTest do
     end
 
     test "can apply sorting", %{conn: conn} do
-      insert!(:community, %{name: "Testing A"})
-      insert!(:community, %{name: "Testing B"})
+      insert(:community, %{name: "Testing A"})
+      insert(:community, %{name: "Testing B"})
 
       {:ok, view, _html} = live(conn, @liveview_route)
 
@@ -94,7 +94,7 @@ defmodule OliWeb.Communities.CommunitiesLiveTest do
     end
 
     test "can apply paging", %{conn: conn} do
-      [first_c | tail] = bulk_insert!(:community, 21) |> Enum.sort_by(& &1.name)
+      [first_c | tail] = insert_list(21, :community) |> Enum.sort_by(& &1.name)
       last_c = List.last(tail)
 
       conn = get(conn, @liveview_route)

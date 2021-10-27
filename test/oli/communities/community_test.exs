@@ -26,7 +26,7 @@ defmodule Oli.Communities.CommunityTest do
     end
 
     test "create community with existing name returns error changeset" do
-      insert!(:community, %{name: "Testing"})
+      insert(:community, %{name: "Testing"})
 
       assert {:error, %Ecto.Changeset{}}
         = Community.create_community(%{name: "Testing"})
@@ -37,7 +37,7 @@ defmodule Oli.Communities.CommunityTest do
     end
 
     test "list communities returns all the communities" do
-      bulk_insert!(:community, 3)
+      insert_list(3, :community)
 
       assert 3 = length(Community.list_communities())
     end
