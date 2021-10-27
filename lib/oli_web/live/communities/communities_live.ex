@@ -19,6 +19,7 @@ defmodule OliWeb.Communities.CommunitiesLive do
   data sort, :string, default: "sort"
   data page_change, :string, default: "page_change"
   data show_bottom_paging, :boolean, default: false
+  data additional_table_class, :string, default: ""
 
   @table_filter_fn &__MODULE__.filter_rows/2
   @table_push_patch_path &__MODULE__.live_path/2
@@ -83,7 +84,8 @@ defmodule OliWeb.Communities.CommunitiesLive do
           limit={@limit}
           sort={@sort}
           page_change={@page_change}
-          show_bottom_paging={@show_bottom_paging}/>
+          show_bottom_paging={@show_bottom_paging}
+          additional_table_class={@additional_table_class}/>
       </div>
     """
   end

@@ -11,6 +11,7 @@ defmodule OliWeb.Common.Listing do
   prop sort, :event, required: true
   prop page_change, :event, required: true
   prop show_bottom_paging, :boolean, default: true
+  prop additional_table_class, :string
 
   def render(assigns) do
     ~F"""
@@ -20,7 +21,7 @@ defmodule OliWeb.Common.Listing do
       {/if}
       {#if @total_count > 0}
         <Paging id="header_paging" total_count={@total_count} offset={@offset} limit={@limit} click={@page_change}/>
-        <Table model={@table_model} sort={@sort}/>
+        <Table model={@table_model} sort={@sort} additional_table_class={@additional_table_class}/>
         {#if @show_bottom_paging}
           <Paging id="footer_paging" total_count={@total_count} offset={@offset} limit={@limit} click={@page_change}/>
         {/if}
