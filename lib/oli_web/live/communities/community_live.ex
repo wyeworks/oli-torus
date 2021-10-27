@@ -40,25 +40,7 @@ defmodule OliWeb.Communities.CommunityLive do
             <div class="text-muted">Main community fields that will be shown to system admins and community admins.</div>
           </div>
           <div class="col-md-8">
-            <Form for={@changeset} submit="save">
-              <Field name={:name} class="form-group">
-                <Label class="control-label">Community Name</Label>
-                <TextInput class="form-control" opts={placeholder: "Name"}/>
-                <ErrorTag/>
-              </Field>
-
-              <Field name={:description} class="form-group">
-                <Label class="control-label">Community Description</Label>
-                <TextArea class="form-control" rows="4" opts={placeholder: "Description"}/>
-              </Field>
-
-              <Field name={:key_contact} class="form-group">
-                <Label class="control-label">Community Contact</Label>
-                <TextInput class="form-control" opts={placeholder: "Key Contact"}/>
-              </Field>
-
-              <button class="form-button btn btn-md btn-primary btn-block" type="submit">Save</button>
-            </Form>
+            <Form changeset={@changeset}/>
           </div>
         </div>
       </div>
