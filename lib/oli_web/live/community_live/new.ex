@@ -1,9 +1,9 @@
-defmodule OliWeb.Communities.CreateCommunityLive do
+defmodule OliWeb.CommunityLive.New do
   use Surface.LiveView, layout: {OliWeb.LayoutView, "live.html"}
 
   alias Oli.Communities.Community
-  alias OliWeb.Common.{Breadcrumb, FormContainer}
-  alias OliWeb.Communities.CommunitiesLive
+  alias OliWeb.Common.{Breadcrumb, FormContainerComponent}
+  alias OliWeb.CommunityLive.Index
   alias OliWeb.Router.Helpers, as: Routes
   alias Surface.Components.Form
   alias Surface.Components.Form.{ErrorTag, Field, TextArea, TextInput}
@@ -13,7 +13,7 @@ defmodule OliWeb.Communities.CreateCommunityLive do
   data breadcrumbs, :any
 
   def breadcrumb() do
-    CommunitiesLive.breadcrumb() ++
+    Index.breadcrumb() ++
       [
         Breadcrumb.new(%{
           full_title: "New",
@@ -29,7 +29,7 @@ defmodule OliWeb.Communities.CreateCommunityLive do
 
   def render(assigns) do
     ~F"""
-      <FormContainer title={@title}>
+      <FormContainerComponent title={@title}>
         <Form for={@community} submit="save">
           <Field name={:name} class="form-group">
             <TextInput class="form-control" opts={placeholder: "Name"}/>
@@ -46,7 +46,7 @@ defmodule OliWeb.Communities.CreateCommunityLive do
 
           <button class="btn btn-md btn-primary btn-block" type="submit">Create</button>
         </Form>
-      </FormContainer>
+      </FormContainerComponent>
     """
   end
 

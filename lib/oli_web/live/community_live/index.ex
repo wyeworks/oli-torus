@@ -1,11 +1,11 @@
-defmodule OliWeb.Communities.CommunitiesLive do
+defmodule OliWeb.CommunityLive.Index do
   use Surface.LiveView, layout: {OliWeb.LayoutView, "live.html"}
   use OliWeb.Common.SortableTable.TableHandlers
 
   alias Oli.Communities.Community
   alias OliWeb.Admin.AdminView
   alias OliWeb.Common.{Breadcrumb, Filter, Listing}
-  alias OliWeb.Communities.{CreateCommunityLive, CommunityTableModel}
+  alias OliWeb.CommunityLive.{New, TableModel}
   alias OliWeb.Router.Helpers, as: Routes
   alias Surface.Components.Link
 
@@ -52,7 +52,7 @@ defmodule OliWeb.Communities.CommunitiesLive do
 
   def mount(_, _, socket) do
     communities = Community.list_communities()
-    {:ok, table_model} = CommunityTableModel.new(communities)
+    {:ok, table_model} = TableModel.new(communities)
 
     {:ok, assign(socket,
       breadcrumbs: breadcrumb(),
@@ -70,7 +70,7 @@ defmodule OliWeb.Communities.CommunitiesLive do
           apply="apply_filter"
           filter={@filter}/>
 
-        <Link class="btn btn-primary" to={Routes.live_path(@socket, CreateCommunityLive)}>
+        <Link class="btn btn-primary" to={Routes.live_path(@socket, New)}>
           Create Community
         </Link>
       </div>

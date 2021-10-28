@@ -1,4 +1,4 @@
-defmodule OliWeb.Communities.CommunityTableModel do
+defmodule OliWeb.CommunityLive.TableModel do
   alias OliWeb.Common.Table.{ColumnSpec, SortableTableModel}
 
   def new(communities) do
