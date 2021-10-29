@@ -1,7 +1,6 @@
-defmodule Oli.Communities.Community do
+defmodule Oli.Groups.Community do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Oli.Repo
 
   schema "communities" do
     field :name, :string
@@ -17,13 +16,5 @@ defmodule Oli.Communities.Community do
     |> cast(attrs, [:name, :description, :key_contact])
     |> validate_required([:name])
     |> unique_constraint(:name)
-  end
-
-  def list_communities, do: Repo.all(__MODULE__)
-
-  def create_community(attrs \\ %{}) do
-    %__MODULE__{}
-    |> __MODULE__.changeset(attrs)
-    |> Repo.insert()
   end
 end

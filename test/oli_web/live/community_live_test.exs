@@ -5,7 +5,8 @@ defmodule OliWeb.CommunityLiveTest do
   import Phoenix.LiveViewTest
   import Oli.Factory
 
-  alias Oli.Communities.Community
+  alias Oli.Groups
+  alias Oli.Groups.Community
 
   @live_view_index_route Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.Index)
   @live_view_new_route Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.New)
@@ -150,7 +151,7 @@ defmodule OliWeb.CommunityLiveTest do
         =~ "Community couldn&#39;t be created. Please check the errors below."
       assert has_element?(view, "span", "can't be blank")
 
-      assert [] = Community.list_communities()
+      assert [] = Groups.list_communities()
     end
 
     test "saves new community when data is valid", %{conn: conn} do
@@ -172,7 +173,7 @@ defmodule OliWeb.CommunityLiveTest do
         name: "Testing name",
         description: "Testing description",
         key_contact: "Testing key contact"} | _tail]
-          = Community.list_communities()
+          = Groups.list_communities()
     end
   end
 

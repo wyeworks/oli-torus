@@ -1,7 +1,8 @@
 defmodule OliWeb.CommunityLive.New do
   use Surface.LiveView, layout: {OliWeb.LayoutView, "live.html"}
 
-  alias Oli.Communities.Community
+  alias Oli.Groups
+  alias Oli.Groups.Community
   alias OliWeb.Common.{Breadcrumb, FormContainerComponent}
   alias OliWeb.CommunityLive.Index
   alias OliWeb.Router.Helpers, as: Routes
@@ -51,7 +52,7 @@ defmodule OliWeb.CommunityLive.New do
   end
 
   def handle_event("save", %{"community" => params}, socket) do
-    case Community.create_community(params) do
+    case Groups.create_community(params) do
       {:ok, _community} ->
         socket = put_flash(socket, :info, "Community succesfully created.")
         {:noreply, assign(socket, community: Community.changeset(%Community{}))}

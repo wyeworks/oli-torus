@@ -2,7 +2,7 @@ defmodule OliWeb.CommunityLive.Index do
   use Surface.LiveView, layout: {OliWeb.LayoutView, "live.html"}
   use OliWeb.Common.SortableTable.TableHandlers
 
-  alias Oli.Communities.Community
+  alias Oli.Groups
   alias OliWeb.Admin.AdminView
   alias OliWeb.Common.{Breadcrumb, Filter, Listing}
   alias OliWeb.CommunityLive.{New, TableModel}
@@ -51,7 +51,7 @@ defmodule OliWeb.CommunityLive.Index do
   end
 
   def mount(_, _, socket) do
-    communities = Community.list_communities()
+    communities = Groups.list_communities()
     {:ok, table_model} = TableModel.new(communities)
 
     {:ok, assign(socket,

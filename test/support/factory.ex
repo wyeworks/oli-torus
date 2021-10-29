@@ -1,7 +1,7 @@
 defmodule Oli.Factory do
   use ExMachina.Ecto, repo: Oli.Repo
 
-  alias Oli.Communities.Community
+  alias Oli.Groups.Community
 
   def community_factory() do
     %Community{
