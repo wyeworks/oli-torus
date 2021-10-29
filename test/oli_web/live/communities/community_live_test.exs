@@ -7,33 +7,30 @@ defmodule OliWeb.Communities.CommunityLiveTest do
 
   alias Oli.Communities.Community
 
-  @liveview_route_preffix "/admin/communities/"
   @form_fields [:name, :description, :key_contact]
 
-  setup do
-    community = insert(:community)
-
-    {:ok, [community: community]}
+  defp community_route(community_id) do
+    Routes.live_path(OliWeb.Endpoint, OliWeb.Communities.CommunityLive, community_id)
   end
 
   describe "user cannot access when is not logged in" do
-    test "redirects to new session", %{conn: conn, community: %Community{id: id}} do
-      expected_path = "/authoring/session/new?request_path=%2Fadmin%2Fcommunities%2F#{id}"
+    test "redirects to new session", %{conn: conn} do
+      expected_path = "/authoring/session/new?request_path=%2Fadmin%2Fcommunities%2F1"
 
       {:error,
         {
           :redirect,
           %{to: ^expected_path}
         }
-      } = live(conn, @liveview_route_preffix <> "#{id}")
+      } = live(conn, community_route(1))
     end
   end
 
   describe "user cannot access when is logged in and is not an admin" do
     setup [:author_conn]
 
-    test "returns forbidden", %{conn: conn, community: %Community{id: id}} do
-      conn = get(conn, @liveview_route_preffix <> "#{id}")
+    test "returns forbidden", %{conn: conn} do
+      conn = get(conn, community_route(1))
 
       assert response(conn, 403)
     end
@@ -42,8 +39,14 @@ defmodule OliWeb.Communities.CommunityLiveTest do
   describe "user can access when is logged in as an admin" do
     setup [:admin_conn]
 
+    setup do
+      community = insert(:community)
+
+      {:ok, [community: community]}
+    end
+
     test "loads correctly with community data", %{conn: conn, community: community} do
-      {:ok, view, _html} = live(conn, @liveview_route_preffix <> "#{community.id}")
+      {:ok, view, _html} = live(conn, community_route(community.id))
 
       assert has_element?(view, "#community-overview")
 
@@ -58,7 +61,7 @@ defmodule OliWeb.Communities.CommunityLiveTest do
     end
 
     test "displays error message when data is invalid", %{conn: conn, community: %Community{id: id}} do
-      {:ok, view, _html} = live(conn, @liveview_route_preffix <> "#{id}")
+      {:ok, view, _html} = live(conn, community_route(id))
 
       view
       |> element("form[phx-submit=\"save\"")
@@ -74,7 +77,7 @@ defmodule OliWeb.Communities.CommunityLiveTest do
     end
 
     test "updates a community correctly when data is valid", %{conn: conn, community: %Community{id: id}} do
-      {:ok, view, _html} = live(conn, @liveview_route_preffix <> "#{id}")
+      {:ok, view, _html} = live(conn, community_route(id))
 
       new_attributes =
         build(:community)
