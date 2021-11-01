@@ -7,7 +7,8 @@ defmodule Oli.Groups.CommunityTest do
 
   describe "changeset/2" do
     test "changeset should be invalid if name is empty" do
-      changeset = build(:community, %{name: ""})
+      changeset =
+        build(:community, %{name: ""})
         |> Community.changeset()
 
       refute changeset.valid?

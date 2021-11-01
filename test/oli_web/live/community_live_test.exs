@@ -13,15 +13,14 @@ defmodule OliWeb.CommunityLiveTest do
 
   describe "user cannot access when is not logged in" do
     test "redirects to new session when accessing the index view", %{conn: conn} do
-      {:error,
-        {:redirect,
-        %{to: "/authoring/session/new?request_path=%2Fadmin%2Fcommunities"}}} = live(conn, @live_view_index_route)
+      {:error, {:redirect, %{to: "/authoring/session/new?request_path=%2Fadmin%2Fcommunities"}}} =
+        live(conn, @live_view_index_route)
     end
 
     test "redirects to new session when accessing the create view", %{conn: conn} do
       {:error,
-        {:redirect,
-        %{to: "/authoring/session/new?request_path=%2Fadmin%2Fcommunities%2Fnew"}}} = live(conn, @live_view_new_route)
+       {:redirect, %{to: "/authoring/session/new?request_path=%2Fadmin%2Fcommunities%2Fnew"}}} =
+        live(conn, @live_view_new_route)
     end
   end
 
@@ -95,18 +94,18 @@ defmodule OliWeb.CommunityLiveTest do
       {:ok, view, _html} = live(conn, @live_view_index_route)
 
       assert view
-        |> element("tr:first-child > td:first-child")
-        |> render()
-        =~ "Testing A"
+             |> element("tr:first-child > td:first-child")
+             |> render() =~
+               "Testing A"
 
       view
       |> element("th[phx-click=\"sort\"]:first-of-type")
       |> render_click(%{sort_by: "name"})
 
       assert view
-        |> element("tr:first-child > td:first-child")
-        |> render()
-        =~ "Testing B"
+             |> element("tr:first-child > td:first-child")
+             |> render() =~
+               "Testing B"
     end
 
     test "applies paging", %{conn: conn} do
@@ -146,9 +145,10 @@ defmodule OliWeb.CommunityLiveTest do
       |> render_submit(%{community: %{name: ""}})
 
       assert view
-        |> element("div.alert.alert-danger")
-        |> render()
-        =~ "Community couldn&#39;t be created. Please check the errors below."
+             |> element("div.alert.alert-danger")
+             |> render() =~
+               "Community couldn&#39;t be created. Please check the errors below."
+
       assert has_element?(view, "span", "can't be blank")
 
       assert [] = Groups.list_communities()
@@ -159,22 +159,28 @@ defmodule OliWeb.CommunityLiveTest do
 
       view
       |> element("form[phx-submit=\"save\"")
-      |> render_submit(%{community: %{
-        name: "Testing name",
-        description: "Testing description",
-        key_contact: "Testing key contact"}})
+      |> render_submit(%{
+        community: %{
+          name: "Testing name",
+          description: "Testing description",
+          key_contact: "Testing key contact"
+        }
+      })
 
       assert view
-        |> element("div.alert.alert-info")
-        |> render()
-        =~ "Community succesfully created."
+             |> element("div.alert.alert-info")
+             |> render() =~
+               "Community succesfully created."
 
-      assert [%Community{
-        name: "Testing name",
-        description: "Testing description",
-        key_contact: "Testing key contact"} | _tail]
-          = Groups.list_communities()
+      assert [
+               %Community{
+                 name: "Testing name",
+                 description: "Testing description",
+                 key_contact: "Testing key contact"
+               }
+               | _tail
+             ] =
+               Groups.list_communities()
     end
   end
-
 end

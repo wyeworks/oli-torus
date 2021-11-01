@@ -24,8 +24,10 @@ defmodule OliWeb.CommunityLive.New do
   end
 
   def mount(_, _, socket) do
-    {:ok, assign(socket,
-      breadcrumbs: breadcrumb())}
+    {:ok,
+     assign(socket,
+       breadcrumbs: breadcrumb()
+     )}
   end
 
   def render(assigns) do
@@ -58,7 +60,13 @@ defmodule OliWeb.CommunityLive.New do
         {:noreply, assign(socket, community: Community.changeset(%Community{}))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        socket = put_flash(socket, :error, "Community couldn't be created. Please check the errors below.")
+        socket =
+          put_flash(
+            socket,
+            :error,
+            "Community couldn't be created. Please check the errors below."
+          )
+
         {:noreply, assign(socket, community: changeset)}
     end
   end

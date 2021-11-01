@@ -54,11 +54,13 @@ defmodule OliWeb.CommunityLive.Index do
     communities = Groups.list_communities()
     {:ok, table_model} = TableModel.new(communities)
 
-    {:ok, assign(socket,
-      breadcrumbs: breadcrumb(),
-      communities: communities,
-      table_model: table_model,
-      total_count: length(communities))}
+    {:ok,
+     assign(socket,
+       breadcrumbs: breadcrumb(),
+       communities: communities,
+       table_model: table_model,
+       total_count: length(communities)
+     )}
   end
 
   def render(assigns) do

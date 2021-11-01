@@ -19,7 +19,6 @@ defmodule Oli.Groups do
   """
   def list_communities, do: Repo.all(Community)
 
-
   @doc """
   Creates a community.
 
