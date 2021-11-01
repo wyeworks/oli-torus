@@ -7,7 +7,7 @@ defmodule OliWeb.CommunityLive.New do
   alias OliWeb.CommunityLive.Index
   alias OliWeb.Router.Helpers, as: Routes
   alias Surface.Components.Form
-  alias Surface.Components.Form.{ErrorTag, Field, TextArea, TextInput}
+  alias Surface.Components.Form.{Checkbox, ErrorTag, Field, Label, TextArea, TextInput}
 
   data title, :string, default: "New Community"
   data community, :changeset, default: Community.changeset(%Community{})
@@ -47,7 +47,12 @@ defmodule OliWeb.CommunityLive.New do
             <TextInput class="form-control" opts={placeholder: "Key Contact"}/>
           </Field>
 
-          <button class="btn btn-md btn-primary btn-block" type="submit">Create</button>
+          <Field name={:prohibit_global_access} class="form-check">
+            <Checkbox class="form-check-input"/>
+            <Label class="form-check-label" text="Prohibit access to Global Project or Products"/>
+          </Field>
+
+          <button class="btn btn-md btn-primary btn-block mt-3" type="submit">Create</button>
         </Form>
       </FormContainerComponent>
     """

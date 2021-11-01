@@ -7,7 +7,8 @@ defmodule Oli.Factory do
     %Community{
       name: sequence("Example Community"),
       description: "An awesome description",
-      key_contact: "keycontact@example.com"
+      key_contact: "keycontact@example.com",
+      prohibit_global_access: false
     }
   end
 end

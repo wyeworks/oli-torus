@@ -163,7 +163,8 @@ defmodule OliWeb.CommunityLiveTest do
         community: %{
           name: "Testing name",
           description: "Testing description",
-          key_contact: "Testing key contact"
+          key_contact: "Testing key contact",
+          prohibit_global_access: true
         }
       })
 
@@ -176,7 +177,8 @@ defmodule OliWeb.CommunityLiveTest do
                %Community{
                  name: "Testing name",
                  description: "Testing description",
-                 key_contact: "Testing key contact"
+                 key_contact: "Testing key contact",
+                 prohibit_global_access: true
                }
                | _tail
              ] =
