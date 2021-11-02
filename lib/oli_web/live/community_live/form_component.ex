@@ -2,7 +2,7 @@ defmodule OliWeb.CommunityLive.FormComponent do
   use Surface.Component
 
   alias Surface.Components.Form
-  alias Surface.Components.Form.{ErrorTag, Field, Label, TextArea, TextInput}
+  alias Surface.Components.Form.{Checkbox, ErrorTag, Field, Label, TextArea, TextInput}
 
   prop changeset, :changeset
   prop display_labels, :boolean, default: true
@@ -32,7 +32,12 @@ defmodule OliWeb.CommunityLive.FormComponent do
         <TextInput class="form-control" opts={placeholder: "Key Contact"}/>
       </Field>
 
-      <button class="form-button btn btn-md btn-primary btn-block" type="submit">Save</button>
+      <Field name={:prohibit_global_access} class="form-check">
+        <Checkbox class="form-check-input"/>
+        <Label class="form-check-label" text="Prohibit access to Global Project or Products"/>
+      </Field>
+
+      <button class="form-button btn btn-md btn-primary btn-block mt-3" type="submit">Save</button>
     </Form>
     """
   end
