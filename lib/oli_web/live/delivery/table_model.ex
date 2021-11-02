@@ -35,7 +35,7 @@ defmodule OliWeb.Delivery.SelectSource.TableModel do
         %ColumnSpec{
           name: :inserted_at,
           label: "Created",
-          render_fn: &__MODULE__.render_date_column/3
+          render_fn: &SortableTableModel.render_date_column/3
         }
       ],
       event_suffix: "",
@@ -100,10 +100,6 @@ defmodule OliWeb.Delivery.SelectSource.TableModel do
       true -> "Product"
       _ -> "Course Project"
     end
-  end
-
-  def render_date_column(_, %{inserted_at: inserted_at}, _) do
-    Timex.format!(inserted_at, "{relative}", :relative)
   end
 
   def render(assigns) do
