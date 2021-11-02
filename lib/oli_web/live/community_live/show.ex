@@ -1,9 +1,10 @@
-defmodule OliWeb.Communities.CommunityLive do
+defmodule OliWeb.CommunityLive.Show do
   use Surface.LiveView, layout: {OliWeb.LayoutView, "live.html"}
 
-  alias Oli.Communities.Community
+  alias Oli.Groups
+  alias Oli.Groups.Community
   alias OliWeb.Common.Breadcrumb
-  alias OliWeb.Communities.{CommunitiesLive, Form}
+  alias OliWeb.CommunityLive.{FormComponent, Index}
   alias OliWeb.Router.Helpers, as: Routes
 
   data title, :string, default: "Edit Community"
@@ -12,7 +13,7 @@ defmodule OliWeb.Communities.CommunityLive do
   data breadcrumbs, :list
 
   def breadcrumb(community_id) do
-    CommunitiesLive.breadcrumb() ++
+    Index.breadcrumb() ++
       [
         Breadcrumb.new(%{
           full_title: "Overview",
@@ -22,7 +23,7 @@ defmodule OliWeb.Communities.CommunityLive do
   end
 
   def mount(%{"community_id" => community_id}, _session, socket) do
-    community = Community.find(community_id)
+    community = Groups.get_community(community_id)
     changeset = Community.changeset(community)
 
     {:ok, assign(socket,
@@ -40,7 +41,7 @@ defmodule OliWeb.Communities.CommunityLive do
             <div class="text-muted">Main community fields that will be shown to system admins and community admins.</div>
           </div>
           <div class="col-md-8">
-            <Form changeset={@changeset}/>
+            <FormComponent changeset={@changeset}/>
           </div>
         </div>
       </div>
@@ -48,7 +49,7 @@ defmodule OliWeb.Communities.CommunityLive do
   end
 
   def handle_event("save", %{"community" => params}, socket) do
-    case Community.update(socket.assigns.community, params) do
+    case Groups.update_community(socket.assigns.community, params) do
       {:ok, community} ->
         socket = put_flash(socket, :info, "Community successfully updated.")
 

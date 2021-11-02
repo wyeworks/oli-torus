@@ -10,6 +10,13 @@ defmodule OliWeb.CommunityLiveTest do
 
   @live_view_index_route Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.Index)
   @live_view_new_route Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.New)
+  @form_fields [:name, :description, :key_contact]
+
+  defp create_community(_conn) do
+    community = insert(:community)
+
+    [community: community]
+  end
 
   describe "user cannot access when is not logged in" do
     test "redirects to new session when accessing the index view", %{conn: conn} do
@@ -173,6 +180,70 @@ defmodule OliWeb.CommunityLiveTest do
       [%Community{name: name} | _tail] = Groups.list_communities()
 
       assert ^name = params.name
+    end
+  end
+
+  describe "show" do
+    defp community_show_route(community_id) do
+      Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.Show, community_id)
+    end
+
+    setup [:admin_conn, :create_community]
+
+    test "loads correctly with community data", %{conn: conn, community: community} do
+      {:ok, view, _html} = live(conn, community_show_route(community.id))
+
+      assert has_element?(view, "#community-overview")
+
+      community
+      |> Map.take(@form_fields)
+      |> Enum.each(fn {field, value} ->
+        assert view
+        |> element("#community_#{field}")
+        |> render()
+        =~ value
+      end)
+    end
+
+    test "displays error message when data is invalid", %{conn: conn, community: %Community{id: id}} do
+      {:ok, view, _html} = live(conn, community_show_route(id))
+
+      view
+      |> element("form[phx-submit=\"save\"")
+      |> render_submit(%{community: %{name: ""}})
+
+      assert view
+        |> element("div.alert.alert-danger")
+        |> render()
+        =~ "Community couldn&#39;t be updated. Please check the errors below."
+      assert has_element?(view, "span", "can't be blank")
+
+      refute Groups.get_community(id).name == ""
+    end
+
+    test "updates a community correctly when data is valid", %{conn: conn, community: %Community{id: id}} do
+      {:ok, view, _html} = live(conn, community_show_route(id))
+
+      new_attributes =
+        build(:community)
+        |> Map.from_struct()
+        |> Map.take(@form_fields)
+
+      view
+      |> element("form[phx-submit=\"save\"")
+      |> render_submit(%{community: new_attributes})
+
+      assert view
+        |> element("div.alert.alert-info")
+        |> render()
+        =~ "Community successfully updated."
+
+      updated_community =
+        Groups.get_community(id)
+        |> Map.from_struct()
+        |> Map.take(@form_fields)
+
+      assert new_attributes == updated_community
     end
   end
 end

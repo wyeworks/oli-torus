@@ -34,5 +34,38 @@ defmodule Oli.GroupsTest do
 
       assert 3 = length(Groups.list_communities())
     end
+
+    test "get_community/1 returns a community when the id exists" do
+      community = insert(:community)
+
+      returned_community = Groups.get_community(community.id)
+
+      assert community.id == returned_community.id
+      assert community.name == returned_community.name
+    end
+
+    test "get_community/1 returns nil if the community does not exist" do
+      assert nil == Groups.get_community(123)
+    end
+
+    test "update_community/2 updates the community successfully" do
+      community = insert(:community)
+
+      {:ok, updated_community} = Groups.update_community(community, %{name: "new_name"})
+
+      assert community.id == updated_community.id
+      assert updated_community.name == "new_name"
+    end
+
+    test "update_community/2 does not update the community when there is an invalid field" do
+      community = insert(:community)
+      another_community = insert(:community)
+
+      {:error, changeset} = Groups.update_community(community, %{name: another_community.name})
+      {error, _} = changeset.errors[:name]
+
+      refute changeset.valid?
+      assert error =~ "has already been taken"
+    end
   end
 end

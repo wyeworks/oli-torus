@@ -4,8 +4,7 @@ defmodule OliWeb.CommunityLive.New do
   alias Oli.Groups
   alias Oli.Groups.Community
   alias OliWeb.Common.{Breadcrumb, FormContainerComponent}
-  alias OliWeb.Communities.Form
-  alias OliWeb.CommunityLive.Index
+  alias OliWeb.CommunityLive.{FormComponent, Index}
   alias OliWeb.Router.Helpers, as: Routes
 
   data(title, :string, default: "New Community")
@@ -31,9 +30,9 @@ defmodule OliWeb.CommunityLive.New do
 
   def render(assigns) do
     ~F"""
-      <FormContainer title={@title}>
-        <Form changeset={@community} display_labels={false}/>
-      </FormContainer>
+      <FormContainerComponent title={@title}>
+        <FormComponent changeset={@community} display_labels={false}/>
+      </FormContainerComponent>
     """
   end
 

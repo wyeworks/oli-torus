@@ -1,4 +1,6 @@
 defmodule OliWeb.CommunityLive.TableModel do
+  use Surface.LiveComponent
+
   alias OliWeb.Common.Table.{ColumnSpec, SortableTableModel}
   alias Surface.Components.Link
   alias OliWeb.Router.Helpers, as: Routes
@@ -39,7 +41,7 @@ defmodule OliWeb.CommunityLive.TableModel do
     ~F"""
       <Link
         label="Overview"
-        to={Routes.live_path(OliWeb.Endpoint, OliWeb.Communities.CommunityLive, community.id)}
+        to={Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.Show, community.id)}
         class="btn btn-sm btn-primary"/>
     """
   end

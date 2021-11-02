@@ -38,30 +38,30 @@ defmodule Oli.Groups do
   end
 
   @doc """
-  Finds a community by id.
+  Gets a community by id.
 
   ## Examples
 
-      iex> find(1)
+      iex> get_community(1)
       %Community{}
-      iex> find(123)
+      iex> get_community(123)
       nil
   """
-  def find(id), do: Repo.get(__MODULE__, id)
+  def get_community(id), do: Repo.get(Community, id)
 
   @doc """
   Updates a community.
 
   ## Examples
 
-      iex> update(community, %{name: new_value})
+      iex> update_community(community, %{name: new_value})
       {:ok, %Community{}}
-      iex> update(community, %{name: bad_value})
+      iex> update_community(community, %{name: bad_value})
       {:error, %Ecto.Changeset{}}
   """
-  def update(%__MODULE__{} = community, attrs) do
+  def update_community(%Community{} = community, attrs) do
     community
-    |> changeset(attrs)
+    |> Community.changeset(attrs)
     |> Repo.update()
   end
 end
