@@ -199,13 +199,16 @@ defmodule OliWeb.CommunityLiveTest do
       |> Map.take(@form_fields)
       |> Enum.each(fn {field, value} ->
         assert view
-        |> element("#community_#{field}")
-        |> render()
-        =~ value
+               |> element("#community_#{field}")
+               |> render() =~
+                 value
       end)
     end
 
-    test "displays error message when data is invalid", %{conn: conn, community: %Community{id: id}} do
+    test "displays error message when data is invalid", %{
+      conn: conn,
+      community: %Community{id: id}
+    } do
       {:ok, view, _html} = live(conn, community_show_route(id))
 
       view
@@ -213,15 +216,19 @@ defmodule OliWeb.CommunityLiveTest do
       |> render_submit(%{community: %{name: ""}})
 
       assert view
-        |> element("div.alert.alert-danger")
-        |> render()
-        =~ "Community couldn&#39;t be updated. Please check the errors below."
+             |> element("div.alert.alert-danger")
+             |> render() =~
+               "Community couldn&#39;t be updated. Please check the errors below."
+
       assert has_element?(view, "span", "can't be blank")
 
       refute Groups.get_community(id).name == ""
     end
 
-    test "updates a community correctly when data is valid", %{conn: conn, community: %Community{id: id}} do
+    test "updates a community correctly when data is valid", %{
+      conn: conn,
+      community: %Community{id: id}
+    } do
       {:ok, view, _html} = live(conn, community_show_route(id))
 
       new_attributes =
@@ -234,9 +241,9 @@ defmodule OliWeb.CommunityLiveTest do
       |> render_submit(%{community: new_attributes})
 
       assert view
-        |> element("div.alert.alert-info")
-        |> render()
-        =~ "Community successfully updated."
+             |> element("div.alert.alert-info")
+             |> render() =~
+               "Community successfully updated."
 
       updated_community =
         Groups.get_community(id)

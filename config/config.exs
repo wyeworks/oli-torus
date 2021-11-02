@@ -126,8 +126,7 @@ config :mnesia, :dir, to_charlist(System.get_env("MNESIA_DIR", ".mnesia"))
 config :surface, :components, [
   {
     Surface.Components.Form.ErrorTag,
-    default_class: "help-block",
-    default_translator: {OliWeb.ErrorHelpers, :translate_error}
+    default_class: "help-block", default_translator: {OliWeb.ErrorHelpers, :translate_error}
   }
 ]
 

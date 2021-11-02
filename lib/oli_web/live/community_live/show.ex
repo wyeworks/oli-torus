@@ -26,10 +26,12 @@ defmodule OliWeb.CommunityLive.Show do
     community = Groups.get_community(community_id)
     changeset = Community.changeset(community)
 
-    {:ok, assign(socket,
-      community: community,
-      changeset: changeset,
-      breadcrumbs: breadcrumb(community_id))}
+    {:ok,
+     assign(socket,
+       community: community,
+       changeset: changeset,
+       breadcrumbs: breadcrumb(community_id)
+     )}
   end
 
   def render(assigns) do
@@ -53,10 +55,16 @@ defmodule OliWeb.CommunityLive.Show do
       {:ok, community} ->
         socket = put_flash(socket, :info, "Community successfully updated.")
 
-        {:noreply, assign(socket, community: community, changeset: Community.changeset(community))}
+        {:noreply,
+         assign(socket, community: community, changeset: Community.changeset(community))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        socket = put_flash(socket, :error, "Community couldn't be updated. Please check the errors below.")
+        socket =
+          put_flash(
+            socket,
+            :error,
+            "Community couldn't be updated. Please check the errors below."
+          )
 
         {:noreply, assign(socket, changeset: changeset)}
     end
