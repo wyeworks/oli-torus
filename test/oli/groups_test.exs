@@ -14,12 +14,12 @@ defmodule Oli.GroupsTest do
           name: "Testing name",
           description: "Testing description",
           key_contact: "Testing key contact",
-          prohibit_global_access: false})
+          global_access: false})
 
       assert community.name == "Testing name"
       assert community.description == "Testing description"
       assert community.key_contact == "Testing key contact"
-      assert community.prohibit_global_access == false
+      assert community.global_access == false
     end
 
     test "create_community/1 with existing name returns error changeset" do

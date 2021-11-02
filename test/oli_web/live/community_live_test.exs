@@ -164,7 +164,7 @@ defmodule OliWeb.CommunityLiveTest do
           name: "Testing name",
           description: "Testing description",
           key_contact: "Testing key contact",
-          prohibit_global_access: true
+          global_access: true
         }
       })
 
@@ -178,7 +178,7 @@ defmodule OliWeb.CommunityLiveTest do
                  name: "Testing name",
                  description: "Testing description",
                  key_contact: "Testing key contact",
-                 prohibit_global_access: true
+                 global_access: true
                }
                | _tail
              ] =
