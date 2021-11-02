@@ -64,4 +64,33 @@ defmodule Oli.Groups do
     |> Community.changeset(attrs)
     |> Repo.update()
   end
+
+  @doc """
+  Deletes a community.
+
+  ## Examples
+
+      iex> delete_community(community)
+      {:ok, %Community{}}
+
+      iex> delete_community(community)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_community(%Community{} = community) do
+    Repo.delete(community)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking community changes.
+
+  ## Examples
+
+      iex> change_community(community)
+      %Ecto.Changeset{data: %Community{}}
+
+  """
+  def change_community(%Community{} = community, attrs \\ %{}) do
+    Community.changeset(community, attrs)
+  end
 end

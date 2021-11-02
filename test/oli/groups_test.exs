@@ -21,8 +21,7 @@ defmodule Oli.GroupsTest do
     test "create_community/1 with existing name returns error changeset" do
       insert(:community, %{name: "Testing"})
 
-      assert {:error, %Ecto.Changeset{}} =
-               Groups.create_community(%{name: "Testing"})
+      assert {:error, %Ecto.Changeset{}} = Groups.create_community(%{name: "Testing"})
     end
 
     test "list_communities/0 returns ok when there are no communities" do
@@ -66,6 +65,17 @@ defmodule Oli.GroupsTest do
 
       refute changeset.valid?
       assert error =~ "has already been taken"
+    end
+
+    test "delete_community/1 deletes the community" do
+      community = insert(:community)
+      assert {:ok, %Community{}} = Groups.delete_community(community)
+      refute Groups.get_community(community.id)
+    end
+
+    test "change_community/1 returns a community changeset" do
+      community = insert(:community)
+      assert %Ecto.Changeset{} = Groups.change_community(community)
     end
   end
 end

@@ -2,7 +2,6 @@ defmodule OliWeb.CommunityLive.Show do
   use Surface.LiveView, layout: {OliWeb.LayoutView, "live.html"}
 
   alias Oli.Groups
-  alias Oli.Groups.Community
   alias OliWeb.Common.Breadcrumb
   alias OliWeb.CommunityLive.{FormComponent, Index}
   alias OliWeb.Router.Helpers, as: Routes
@@ -24,7 +23,7 @@ defmodule OliWeb.CommunityLive.Show do
 
   def mount(%{"community_id" => community_id}, _session, socket) do
     community = Groups.get_community(community_id)
-    changeset = Community.changeset(community)
+    changeset = Groups.change_community(community)
 
     {:ok,
      assign(socket,
@@ -56,7 +55,7 @@ defmodule OliWeb.CommunityLive.Show do
         socket = put_flash(socket, :info, "Community successfully updated.")
 
         {:noreply,
-         assign(socket, community: community, changeset: Community.changeset(community))}
+         assign(socket, community: community, changeset: Groups.change_community(community))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         socket =

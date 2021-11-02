@@ -8,7 +8,7 @@ defmodule OliWeb.CommunityLive.New do
   alias OliWeb.Router.Helpers, as: Routes
 
   data(title, :string, default: "New Community")
-  data(community, :changeset, default: Community.changeset(%Community{}))
+  data(community, :changeset, default: Groups.change_community(%Community{})
   data(breadcrumbs, :list)
 
   def breadcrumb() do
@@ -40,7 +40,7 @@ defmodule OliWeb.CommunityLive.New do
     case Groups.create_community(params) do
       {:ok, _community} ->
         socket = put_flash(socket, :info, "Community succesfully created.")
-        {:noreply, assign(socket, community: Community.changeset(%Community{}))}
+        {:noreply, assign(socket, community: Groups.change_community(%Community{}))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         socket =
