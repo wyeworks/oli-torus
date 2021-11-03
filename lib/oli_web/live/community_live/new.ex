@@ -31,7 +31,7 @@ defmodule OliWeb.CommunityLive.New do
   def render(assigns) do
     ~F"""
       <FormContainerComponent title={@title}>
-        <FormComponent changeset={@community} display_labels={false}/>
+        <FormComponent changeset={@community} save="save" display_labels={false}/>
       </FormContainerComponent>
     """
   end

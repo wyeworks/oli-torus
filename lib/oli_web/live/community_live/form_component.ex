@@ -4,12 +4,13 @@ defmodule OliWeb.CommunityLive.FormComponent do
   alias Surface.Components.Form
   alias Surface.Components.Form.{Checkbox, ErrorTag, Field, Label, TextArea, TextInput}
 
-  prop changeset, :changeset
-  prop display_labels, :boolean, default: true
+  prop(changeset, :changeset, required: true)
+  prop(save, :event, required: true)
+  prop(display_labels, :boolean, default: true)
 
   def render(assigns) do
     ~F"""
-    <Form for={@changeset} submit="save">
+    <Form for={@changeset} submit={@save}>
       <Field name={:name} class="form-group">
         {#if @display_labels}
           <Label class="control-label">Community Name</Label>

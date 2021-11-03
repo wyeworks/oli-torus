@@ -6,10 +6,10 @@ defmodule OliWeb.CommunityLive.Show do
   alias OliWeb.CommunityLive.{FormComponent, Index}
   alias OliWeb.Router.Helpers, as: Routes
 
-  data title, :string, default: "Edit Community"
-  data community, :struct
-  data changeset, :changeset
-  data breadcrumbs, :list
+  data(title, :string, default: "Edit Community")
+  data(community, :struct)
+  data(changeset, :changeset)
+  data(breadcrumbs, :list)
 
   def breadcrumb(community_id) do
     Index.breadcrumb() ++
@@ -42,7 +42,7 @@ defmodule OliWeb.CommunityLive.Show do
             <div class="text-muted">Main community fields that will be shown to system admins and community admins.</div>
           </div>
           <div class="col-md-8">
-            <FormComponent changeset={@changeset}/>
+            <FormComponent changeset={@changeset} save="save"/>
           </div>
         </div>
       </div>
