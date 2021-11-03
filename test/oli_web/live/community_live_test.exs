@@ -250,10 +250,7 @@ defmodule OliWeb.CommunityLiveTest do
     } do
       {:ok, view, _html} = live(conn, live_view_show_route(id))
 
-      new_attributes =
-        build(:community)
-        |> Map.from_struct()
-        |> Map.take(@form_fields)
+      new_attributes = params_for(:community)
 
       view
       |> element("form[phx-submit=\"save\"")
@@ -264,12 +261,9 @@ defmodule OliWeb.CommunityLiveTest do
              |> render() =~
                "Community successfully updated."
 
-      updated_community =
-        Groups.get_community(id)
-        |> Map.from_struct()
-        |> Map.take(@form_fields)
+      %Community{name: new_name} = Groups.get_community(id)
 
-      assert new_attributes == updated_community
+      assert new_attributes.name == new_name
     end
   end
 end
