@@ -2,7 +2,6 @@ defmodule OliWeb.CommunityLive.TableModel do
   use Surface.LiveComponent
 
   alias OliWeb.Common.Table.{ColumnSpec, SortableTableModel}
-  alias Surface.Components.Link
   alias OliWeb.Router.Helpers, as: Routes
 
   def new(communities) do
@@ -29,7 +28,7 @@ defmodule OliWeb.CommunityLive.TableModel do
         %ColumnSpec{
           name: :actions,
           label: "Actions",
-          render_fn: &__MODULE__.custom_render/3
+          render_fn: &__MODULE__.render_overview_button/3
         }
       ],
       event_suffix: "",
@@ -37,12 +36,9 @@ defmodule OliWeb.CommunityLive.TableModel do
     )
   end
 
-  def custom_render(assigns, community, %ColumnSpec{name: :actions}) do
-    ~F"""
-      <Link
-        label="Overview"
-        to={Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.Show, community.id)}
-        class="btn btn-sm btn-primary"/>
-    """
+  def render_overview_button(assigns, community, _) do
+    route_path = Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.Show, community.id)
+
+    SortableTableModel.render_link_column(assigns, "Overview", route_path, "btn btn-sm btn-primary")
   end
 end
