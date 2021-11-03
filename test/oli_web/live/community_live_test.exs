@@ -10,7 +10,7 @@ defmodule OliWeb.CommunityLiveTest do
 
   @live_view_index_route Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.Index)
   @live_view_new_route Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.New)
-  @form_fields [:name, :description, :key_contact, :prohibit_global_access]
+  @form_fields [:name, :description, :key_contact, :global_access]
 
   defp live_view_show_route(community_id) do
     Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.Show, community_id)
@@ -215,7 +215,7 @@ defmodule OliWeb.CommunityLiveTest do
 
       community
       |> Map.take(@form_fields)
-      |> Map.update(:prohibit_global_access, "", fn value -> if value, do: "checked", else: "" end)
+      |> Map.update(:global_access, "checked", fn value -> if value, do: "checked", else: "" end)
       |> Enum.each(fn {field, value} ->
         assert view
                |> element("#community_#{field}")

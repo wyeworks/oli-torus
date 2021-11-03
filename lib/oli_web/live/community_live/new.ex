@@ -8,7 +8,7 @@ defmodule OliWeb.CommunityLive.New do
   alias OliWeb.Router.Helpers, as: Routes
 
   data(title, :string, default: "New Community")
-  data(community, :changeset, default: Groups.change_community(%Community{})
+  data(community, :changeset, default: Groups.change_community(%Community{}))
   data(breadcrumbs, :list)
 
   def breadcrumb() do
