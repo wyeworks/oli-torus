@@ -22,15 +22,24 @@ defmodule OliWeb.CommunityLive.Show do
   end
 
   def mount(%{"community_id" => community_id}, _session, socket) do
-    community = Groups.get_community(community_id)
-    changeset = Groups.change_community(community)
+    socket =
+      case Groups.get_community(community_id) do
+        nil ->
+          socket
+          |> put_flash(:info, "That community does not exist.")
+          |> push_redirect(to: Routes.live_path(OliWeb.Endpoint, Index))
 
-    {:ok,
-     assign(socket,
-       community: community,
-       changeset: changeset,
-       breadcrumbs: breadcrumb(community_id)
-     )}
+        community ->
+          changeset = Groups.change_community(community)
+
+          assign(socket,
+            community: community,
+            changeset: changeset,
+            breadcrumbs: breadcrumb(community_id)
+          )
+      end
+
+    {:ok, socket}
   end
 
   def render(assigns) do

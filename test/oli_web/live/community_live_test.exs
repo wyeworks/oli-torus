@@ -265,5 +265,17 @@ defmodule OliWeb.CommunityLiveTest do
 
       assert new_attributes.name == new_name
     end
+
+    test "redirects to index view and displays error message when community does not exist", %{
+      conn: conn
+    } do
+      conn = get(conn, live_view_show_route(1000))
+
+      assert conn.private.plug_session["phoenix_flash"]["info"] ==
+               "That community does not exist."
+
+      assert conn.resp_body =~ ~r/You are being.*redirected/
+      assert conn.resp_body =~ "href=\"#{@live_view_index_route}\""
+    end
   end
 end
