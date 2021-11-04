@@ -1,6 +1,4 @@
 defmodule OliWeb.CommunityLive.TableModel do
-  use Surface.LiveComponent
-
   alias OliWeb.Common.Table.{ColumnSpec, SortableTableModel}
   alias OliWeb.Router.Helpers, as: Routes
 
@@ -39,6 +37,11 @@ defmodule OliWeb.CommunityLive.TableModel do
   def render_overview_button(assigns, community, _) do
     route_path = Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.Show, community.id)
 
-    SortableTableModel.render_link_column(assigns, "Overview", route_path, "btn btn-sm btn-primary")
+    SortableTableModel.render_link_column(
+      assigns,
+      "Overview",
+      route_path,
+      "btn btn-sm btn-primary"
+    )
   end
 end

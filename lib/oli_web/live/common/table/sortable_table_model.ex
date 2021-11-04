@@ -188,4 +188,10 @@ defmodule OliWeb.Common.Table.SortableTableModel do
         class={class}/>
     """
   end
+
+  def render(assigns) do
+    ~F"""
+      <div>nothing</div>
+    """
+  end
 end
