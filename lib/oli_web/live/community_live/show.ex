@@ -54,6 +54,17 @@ defmodule OliWeb.CommunityLive.Show do
             <FormComponent changeset={@changeset} save="save"/>
           </div>
         </div>
+        <div class="row py-5 border-bottom">
+          <div class="col-md-4">
+            <h4>Actions</h4>
+          </div>
+          <div class="col-md-8">
+            <div class="d-flex align-items-center">
+              <button type="button" class="btn btn-link text-danger action-button" :on-click="delete">Delete</button>
+              <span>Permanently delete this community.</span>
+            </div>
+          </div>
+        </div>
       </div>
     """
   end
@@ -76,5 +87,24 @@ defmodule OliWeb.CommunityLive.Show do
 
         {:noreply, assign(socket, changeset: changeset)}
     end
+  end
+
+  def handle_event("delete", _params, socket) do
+    socket =
+      case Groups.delete_community(socket.assigns.community) do
+        {:ok, _community} ->
+          socket
+          |> put_flash(:info, "Community successfully deleted.")
+          |> push_redirect(to: Routes.live_path(OliWeb.Endpoint, Index))
+
+        {:error, %Ecto.Changeset{}} ->
+          put_flash(
+            socket,
+            :error,
+            "Community couldn't be deleted."
+          )
+      end
+
+    {:noreply, socket}
   end
 end

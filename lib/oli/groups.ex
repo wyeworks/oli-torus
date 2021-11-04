@@ -78,7 +78,7 @@ defmodule Oli.Groups do
 
   """
   def delete_community(%Community{} = community) do
-    Repo.delete(community)
+    update_community(community, %{status: :deleted})
   end
 
   @doc """
