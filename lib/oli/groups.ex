@@ -20,6 +20,27 @@ defmodule Oli.Groups do
   def list_communities, do: Repo.all(Community)
 
   @doc """
+  Returns the list of communities that meets the criteria passed in the input.
+
+  ## Examples
+
+      iex> search_communities(%{status: :active})
+      [%Community{status: :active}, ...]
+
+      iex> search_communities(%{global_access: false})
+      []
+  """
+  def search_communities(filter) do
+    conditions =
+      Enum.reduce(filter, false, fn {field, value}, conditions ->
+        dynamic([c], field(c, ^field) == ^value or ^conditions)
+      end)
+
+    from(c in Community, where: ^conditions)
+    |> Repo.all()
+  end
+
+  @doc """
   Creates a community.
 
   ## Examples
