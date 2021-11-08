@@ -4,9 +4,11 @@ defmodule Oli.Groups do
   """
 
   import Ecto.Query, warn: false
-  alias Oli.Repo
 
+  alias Oli.Accounts.Author
   alias Oli.Groups.Community
+  alias Oli.Groups.CommunityAccount
+  alias Oli.Repo
 
   @doc """
   Returns the list of communities.
@@ -114,5 +116,23 @@ defmodule Oli.Groups do
     Enum.reduce(filter, false, fn {field, value}, conditions ->
       dynamic([entity], field(entity, ^field) == ^value or ^conditions)
     end)
+  end
+
+  @doc """
+  Creates a community account.
+
+  ## Examples
+
+      iex> create_community_account(%{field: new_value})
+      {:ok, %CommunityAccount{}}
+
+      iex> create_community_account(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_community_account(attrs \\ %{}) do
+    %CommunityAccount{}
+    |> CommunityAccount.changeset(attrs)
+    |> Repo.insert()
   end
 end
