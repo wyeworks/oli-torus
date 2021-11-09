@@ -1,8 +1,9 @@
 defmodule OliWeb.CommunityLive.Show do
   use Surface.LiveView, layout: {OliWeb.LayoutView, "live.html"}
+  use OliWeb.Common.Modal
 
   alias Oli.Groups
-  alias OliWeb.Common.Breadcrumb
+  alias OliWeb.Common.{Breadcrumb, DeleteModalComponent}
   alias OliWeb.CommunityLive.{FormComponent, Index}
   alias OliWeb.Router.Helpers, as: Routes
 
@@ -10,6 +11,12 @@ defmodule OliWeb.CommunityLive.Show do
   data(community, :struct)
   data(changeset, :changeset)
   data(breadcrumbs, :list)
+  data(modal, :any, default: nil)
+
+  @delete_modal_description """
+    This action will not affect existing course sections that are using this community.
+    Those sections will continue to operate as intended.
+  """
 
   def breadcrumb(community_id) do
     Index.breadcrumb() ++
@@ -44,6 +51,7 @@ defmodule OliWeb.CommunityLive.Show do
 
   def render(assigns) do
     ~F"""
+      {render_modal(assigns)}
       <div id="community-overview" class="overview container">
         <div class="row py-5 border-bottom">
           <div class="col-md-4">
@@ -60,7 +68,7 @@ defmodule OliWeb.CommunityLive.Show do
           </div>
           <div class="col-md-8">
             <div class="d-flex align-items-center">
-              <button type="button" class="btn btn-link text-danger action-button" :on-click="delete">Delete</button>
+              <button type="button" class="btn btn-link text-danger action-button" :on-click="show_delete_community_modal">Delete</button>
               <span>Permanently delete this community.</span>
             </div>
           </div>
@@ -105,6 +113,36 @@ defmodule OliWeb.CommunityLive.Show do
           )
       end
 
-    {:noreply, socket}
+    {:noreply, socket |> hide_modal()}
+  end
+
+  def handle_event("validate_name", %{"community" => %{"name" => name}}, socket) do
+    delete_enabled = name == socket.assigns.community.name
+    %{modal: modal} = socket.assigns
+
+    modal = %{
+      modal
+      | assigns: %{
+          modal.assigns
+          | delete_enabled: delete_enabled
+        }
+    }
+
+    {:noreply, assign(socket, modal: modal)}
+  end
+
+  def handle_event("show_delete_community_modal", _, socket) do
+    modal = %{
+      component: DeleteModalComponent,
+      assigns: %{
+        id: "delete_community_modal",
+        description: @delete_modal_description,
+        entity_name: socket.assigns.community.name,
+        entity_type: "community",
+        delete_enabled: false
+      }
+    }
+
+    {:noreply, assign(socket, modal: modal)}
   end
 end
