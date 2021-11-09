@@ -4,7 +4,7 @@ defmodule OliWeb.CommunityLive.Show do
 
   alias Oli.Groups
   alias OliWeb.Common.{Breadcrumb, DeleteModalComponent}
-  alias OliWeb.CommunityLive.{FormComponent, Index}
+  alias OliWeb.CommunityLive.{FormComponent, Index, ShowSectionComponent}
   alias OliWeb.Router.Helpers, as: Routes
 
   data(title, :string, default: "Edit Community")
@@ -53,26 +53,15 @@ defmodule OliWeb.CommunityLive.Show do
     ~F"""
       {render_modal(assigns)}
       <div id="community-overview" class="overview container">
-        <div class="row py-5 border-bottom">
-          <div class="col-md-4">
-            <h4>Details</h4>
-            <div class="text-muted">Main community fields that will be shown to system admins and community admins.</div>
+        <ShowSectionComponent section_title="Details" section_description="Main community fields that will be shown to system admins and community admins.">
+          <FormComponent changeset={@changeset} save="save"/>
+        </ShowSectionComponent>
+        <ShowSectionComponent section_title="Actions">
+          <div class="d-flex align-items-center">
+            <button type="button" class="btn btn-link text-danger action-button" :on-click="show_delete_community_modal">Delete</button>
+            <span>Permanently delete this community.</span>
           </div>
-          <div class="col-md-8">
-            <FormComponent changeset={@changeset} save="save"/>
-          </div>
-        </div>
-        <div class="row py-5 border-bottom">
-          <div class="col-md-4">
-            <h4>Actions</h4>
-          </div>
-          <div class="col-md-8">
-            <div class="d-flex align-items-center">
-              <button type="button" class="btn btn-link text-danger action-button" :on-click="show_delete_community_modal">Delete</button>
-              <span>Permanently delete this community.</span>
-            </div>
-          </div>
-        </div>
+        </ShowSectionComponent>
       </div>
     """
   end
@@ -139,7 +128,9 @@ defmodule OliWeb.CommunityLive.Show do
         description: @delete_modal_description,
         entity_name: socket.assigns.community.name,
         entity_type: "community",
-        delete_enabled: false
+        delete_enabled: false,
+        validate: "validate_name",
+        delete: "delete"
       }
     }
 
