@@ -381,5 +381,104 @@ defmodule OliWeb.CommunityLiveTest do
 
       assert nil == Groups.get_community(id)
     end
+
+    test "adds community admin correctly", %{
+      conn: conn,
+      community: community
+    } do
+      author = insert(:author)
+      insert(:community_account, %{community: community})
+
+      {:ok, view, _html} = live(conn, live_view_show_route(community.id))
+
+      assert 1 == length(Groups.list_community_admins(community.id))
+
+      view
+      |> element("form[phx-submit=\"add_collaborator\"")
+      |> render_submit(%{collaborator: %{email: author.email}})
+
+      assert view
+             |> element("div.alert.alert-info")
+             |> render() =~
+               "Admin successfully added."
+
+      assert 2 == length(Groups.list_community_admins(community.id))
+    end
+
+    test "displays error messages when adding community admin fails", %{
+      conn: conn,
+      community: community
+    } do
+      author = build(:author)
+      insert(:community_account, %{community: community, author: author})
+
+      {:ok, view, _html} = live(conn, live_view_show_route(community.id))
+
+      view
+      |> element("form[phx-submit=\"add_collaborator\"")
+      |> render_submit(%{collaborator: %{email: author.email}})
+
+      assert view
+             |> element("div.alert.alert-danger")
+             |> render() =~
+               "Community admin couldn&#39;t be added. Author is already an admin or an unexpected error occurred (check logs)."
+
+      view
+      |> element("form[phx-submit=\"add_collaborator\"")
+      |> render_submit(%{collaborator: %{email: "wrong@example.com"}})
+
+      assert view
+             |> element("div.alert.alert-danger")
+             |> render() =~
+               "Community admin couldn&#39;t be added. Author does not exist."
+
+      assert 1 == length(Groups.list_community_admins(community.id))
+    end
+
+    test "removes community admin correctly", %{
+      conn: conn,
+      community: community
+    } do
+      author = insert(:author)
+      insert(:community_account, %{community: community, author: author})
+
+      {:ok, view, _html} = live(conn, live_view_show_route(community.id))
+
+      assert 1 == length(Groups.list_community_admins(community.id))
+
+      view
+      |> element("button[phx-click=\"remove_collaborator\"")
+      |> render_click(%{"collaborator-id" => author.id})
+
+      assert view
+             |> element("div.alert.alert-info")
+             |> render() =~
+               "Admin successfully removed."
+
+      assert 0 == length(Groups.list_community_admins(community.id))
+    end
+
+    test "displays error messages when removing community admin fails", %{
+      conn: conn,
+      community: community
+    } do
+      author = insert(:author)
+      insert(:community_account, %{community: community, author: author})
+
+      {:ok, view, _html} = live(conn, live_view_show_route(community.id))
+
+      assert 1 == length(Groups.list_community_admins(community.id))
+
+      view
+      |> element("button[phx-click=\"remove_collaborator\"")
+      |> render_click(%{"collaborator-id" => 12345})
+
+      assert view
+             |> element("div.alert.alert-danger")
+             |> render() =~
+               "Community admin couldn&#39;t be removed. Check logs."
+
+      assert 1 == length(Groups.list_community_admins(community.id))
+    end
   end
 end

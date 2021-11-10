@@ -5,6 +5,7 @@ defmodule Oli.Groups do
 
   import Ecto.Query, warn: false
 
+  alias Oli.Accounts
   alias Oli.Accounts.Author
   alias Oli.Groups.Community
   alias Oli.Groups.CommunityAccount
@@ -134,5 +135,83 @@ defmodule Oli.Groups do
     %CommunityAccount{}
     |> CommunityAccount.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Creates a community account from an author email (gets the author first).
+
+  ## Examples
+
+      iex> create_community_account_from_author_email("example@foo.com", %{field: new_value})
+      {:ok, %CommunityAccount{}}
+
+      iex> create_community_account_from_author_email("example@foo.com", %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+
+  def create_community_account_from_author_email(email, attrs \\ %{}) do
+    case Accounts.get_author_by_email(email) do
+      %Author{id: id} ->
+        attrs |> Map.put(:author_id, id) |> create_community_account()
+
+      _ ->
+        {:error, :not_found}
+    end
+  end
+
+  @doc """
+  Gets a community account by id.
+
+  ## Examples
+
+      iex> get_community_account(1)
+      %CommunityAccount{}
+      iex> get_community_account(123)
+      nil
+  """
+  def get_community_account(id), do: Repo.get(CommunityAccount, id)
+
+  @doc """
+  Deletes a community account.
+
+  ## Examples
+
+      iex> delete_community_account(%{community_id: 1, author_id: 1})
+      {:ok, %CommunityAccount{}}
+
+      iex> delete_community_account(%{community_id: 1, author_id: bad})
+      nil
+
+  """
+  def delete_community_account(clauses) do
+    case Repo.get_by(CommunityAccount, clauses) do
+      nil -> {:error, :not_found}
+      community_account -> Repo.delete(community_account)
+    end
+  end
+
+  @doc """
+  Get all the admins for a specific community.
+
+  ## Examples
+
+      iex> list_community_admins(1)
+      {:ok, [%Author{}, ...]}
+
+      iex> list_community_admins(123)
+      {:ok, []}
+  """
+  def list_community_admins(community_id) do
+    Repo.all(
+      from(
+        community_account in CommunityAccount,
+        join: author in Author,
+        on: community_account.author_id == author.id,
+        where:
+          community_account.community_id == ^community_id and community_account.is_admin == true,
+        select: author
+      )
+    )
   end
 end
