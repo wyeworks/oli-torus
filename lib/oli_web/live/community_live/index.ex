@@ -56,8 +56,18 @@ defmodule OliWeb.CommunityLive.Index do
       ]
   end
 
-  def mount(_, _, socket) do
-    communities = Groups.list_communities()
+  def mount(
+        _,
+        %{"is_community_admin" => is_community_admin, "current_author_id" => author_id},
+        socket
+      ) do
+    communities =
+      if is_community_admin do
+        Groups.list_admin_communities(author_id)
+      else
+        Groups.list_communities()
+      end
+
     {:ok, table_model} = TableModel.new(communities)
 
     {:ok,
@@ -65,7 +75,8 @@ defmodule OliWeb.CommunityLive.Index do
        breadcrumbs: breadcrumb(),
        communities: communities,
        table_model: table_model,
-       total_count: length(communities)
+       total_count: length(communities),
+       is_community_admin: is_community_admin
      )}
   end
 
@@ -78,9 +89,11 @@ defmodule OliWeb.CommunityLive.Index do
           apply="apply_search"
           query={@query}/>
 
-        <Link class="btn btn-primary" to={Routes.live_path(@socket, New)}>
-          Create Community
-        </Link>
+        {#if not @is_community_admin}
+          <Link class="btn btn-primary" to={Routes.live_path(@socket, New)}>
+            Create Community
+          </Link>
+        {/if}
       </div>
       <div id="community-filters" class="p-3">
         <Form for={:filter} change="apply_filter" class="pl-4">

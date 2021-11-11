@@ -24,7 +24,8 @@ defmodule OliWeb.CommunityLiveTest do
 
   describe "user cannot access when is not logged in" do
     test "redirects to new session when accessing the index view", %{conn: conn} do
-      {:error, {:redirect, %{to: "/authoring/session/new?request_path=%2Fadmin%2Fcommunities"}}} =
+      {:error,
+       {:redirect, %{to: "/authoring/session/new?request_path=%2Fauthoring%2Fcommunities"}}} =
         live(conn, @live_view_index_route)
     end
 
@@ -38,20 +39,18 @@ defmodule OliWeb.CommunityLiveTest do
       community_id = insert(:community).id
 
       redirect_path =
-        "/authoring/session/new?request_path=%2Fadmin%2Fcommunities%2F#{community_id}"
+        "/authoring/session/new?request_path=%2Fauthoring%2Fcommunities%2F#{community_id}"
 
       {:error, {:redirect, %{to: ^redirect_path}}} =
         live(conn, live_view_show_route(community_id))
     end
   end
 
-  describe "user cannot access when is logged in and is not an admin" do
+  describe "user cannot access when is logged in as an author but is not a system or community admin" do
     setup [:author_conn]
 
-    test "returns forbidden when accessing the index view", %{conn: conn} do
-      conn = get(conn, @live_view_index_route)
-
-      assert response(conn, 403)
+    test "redirects to projects when accessing the index view", %{conn: conn} do
+      {:error, {:redirect, %{to: "/authoring/projects"}}} = live(conn, @live_view_index_route)
     end
 
     test "returns forbidden when accessing the create view", %{conn: conn} do
@@ -60,12 +59,22 @@ defmodule OliWeb.CommunityLiveTest do
       assert response(conn, 403)
     end
 
-    test "returns forbidden when accessing the show view", %{conn: conn} do
+    test "redirects to projects when accessing the show view", %{conn: conn} do
       community = insert(:community)
 
-      conn = get(conn, live_view_show_route(community.id))
+      {:error, {:redirect, %{to: "/authoring/projects"}}} =
+        live(conn, live_view_show_route(community.id))
+    end
 
-      assert response(conn, 403)
+    test "redirects to communities when accessing a community that is not an admin", %{
+      conn: conn,
+      author: author
+    } do
+      insert(:community)
+      insert(:community_account, %{author: author})
+
+      {:error, {:redirect, %{to: "/authoring/communities"}}} =
+        live(conn, live_view_show_route(123))
     end
   end
 
@@ -77,7 +86,7 @@ defmodule OliWeb.CommunityLiveTest do
 
       assert has_element?(view, "#communities-table")
       assert has_element?(view, "p", "None exist")
-      assert has_element?(view, "a[href=\"#{@live_view_index_route}/new\"]")
+      assert has_element?(view, "a[href=\"#{@live_view_new_route}\"]")
     end
 
     test "lists only active communities", %{conn: conn} do

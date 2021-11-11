@@ -4,10 +4,9 @@ defmodule Oli.GroupsTest do
   import Oli.Factory
 
   alias Oli.Groups
+  alias Oli.Groups.Community
 
   describe "community" do
-    alias Oli.Groups.Community
-
     test "create_community/1 with valid data creates a community" do
       params = params_for(:community)
       assert {:ok, %Community{} = community} = Groups.create_community(params)
@@ -196,6 +195,76 @@ defmodule Oli.GroupsTest do
 
       assert [%Author{} | _tail] = admins
       assert 2 = length(admins)
+    end
+
+    test "get_community_account_by/1 returns a community account when meets the clauses" do
+      community_account = insert(:community_account)
+
+      returned_community_account =
+        Groups.get_community_account_by(%{
+          community_id: community_account.community_id,
+          author_id: community_account.author_id
+        })
+
+      assert community_account.id == returned_community_account.id
+      assert community_account.author_id == returned_community_account.author_id
+      assert community_account.community_id == returned_community_account.community_id
+    end
+
+    test "get_community_account_by/1 returns nil if the community account does not exist" do
+      assert nil ==
+               Groups.get_community_account_by(%{
+                 community_id: 1,
+                 author_id: 2
+               })
+    end
+
+    test "get_community_account_by/1 returns error if more than one meets the requirements" do
+      community_account = insert(:community_account)
+      insert(:community_account, %{community: community_account.community})
+
+      assert_raise Ecto.MultipleResultsError,
+                   ~r/^expected at most one result but got 2 in query/,
+                   fn ->
+                     Groups.get_community_account_by(%{
+                       community_id: community_account.community_id
+                     })
+                   end
+    end
+
+    test "list_admin_communities/1 returns the communities for an admin" do
+      community_account = insert(:community_account)
+      insert(:community_account, %{author: community_account.author})
+      insert(:community_account, %{author: community_account.author, is_admin: false})
+
+      communties = Groups.list_admin_communities(community_account.author_id)
+
+      assert [%Community{} | _tail] = communties
+      assert 2 = length(communties)
+    end
+
+    test "list_community_accounts_by_account_id/1 returns a community account when the id exists" do
+      community_account = insert(:community_account)
+      insert(:community_account, %{author: community_account.author})
+
+      author_community_accounts =
+        Groups.list_community_accounts_by_account_id(community_account.author_id)
+
+      assert [%CommunityAccount{} | _tail] = author_community_accounts
+      assert 2 = length(author_community_accounts)
+
+      insert(:community_account)
+      insert(:community_account, %{user: community_account.user})
+
+      user_community_accounts =
+        Groups.list_community_accounts_by_account_id(community_account.user_id)
+
+      assert [%CommunityAccount{} | _tail] = user_community_accounts
+      assert 2 = length(user_community_accounts)
+    end
+
+    test "list_community_accounts_by_account_id/1 returns nil if the community account does not exist" do
+      assert [] == Groups.list_community_accounts_by_account_id(123)
     end
   end
 end
