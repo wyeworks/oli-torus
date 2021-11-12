@@ -98,18 +98,18 @@ defmodule OliWeb.CommunityLiveTest do
       {:ok, view, _html} = live(conn, @live_view_index_route)
 
       view
-      |> element("input[phx-blur=\"change_filter\"]")
+      |> element("input[phx-blur=\"change_search\"]")
       |> render_blur(%{value: "testing"})
 
       view
-      |> element("button[phx-click=\"apply_filter\"]")
+      |> element("button[phx-click=\"apply_search\"]")
       |> render_click()
 
       assert has_element?(view, "##{c1.id}")
       refute has_element?(view, "##{c2.id}")
 
       view
-      |> element("button[phx-click=\"reset_filter\"]")
+      |> element("button[phx-click=\"reset_search\"]")
       |> render_click()
 
       assert has_element?(view, "##{c1.id}")

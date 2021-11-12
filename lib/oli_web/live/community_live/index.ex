@@ -14,8 +14,8 @@ defmodule OliWeb.CommunityLive.Index do
   data(title, :string, default: "Communities")
   data(breadcrumbs, :any)
 
-  data(field_filter, :any, default: %{"status" => "active"})
-  data(filter, :string, default: "")
+  data(filter, :any, default: %{"status" => "active"})
+  data(query, :string, default: "")
   data(total_count, :integer, default: 0)
   data(offset, :integer, default: 0)
   data(limit, :integer, default: 20)
@@ -27,17 +27,17 @@ defmodule OliWeb.CommunityLive.Index do
   @table_filter_fn &__MODULE__.filter_rows/3
   @table_push_patch_path &__MODULE__.live_path/2
 
-  def filter_rows(socket, filter, field_filter) do
-    field_filter =
-      Enum.reduce(field_filter, %{}, fn {field, value}, acc ->
+  def filter_rows(socket, query, filter) do
+    filter =
+      Enum.reduce(filter, %{}, fn {field, value}, acc ->
         Map.put(acc, field, String.split(value, ","))
       end)
 
-    filter_str = String.downcase(filter)
-    status_list = field_filter["status"]
+    query_str = String.downcase(query)
+    status_list = filter["status"]
 
     Enum.filter(socket.assigns.communities, fn c ->
-      String.contains?(String.downcase(c.name), filter_str) and
+      String.contains?(String.downcase(c.name), query_str) and
         Enum.member?(status_list, Atom.to_string(c.status))
     end)
   end
@@ -73,19 +73,19 @@ defmodule OliWeb.CommunityLive.Index do
     ~F"""
       <div class="d-flex p-3 justify-content-between">
         <Filter
-          change="change_filter"
-          reset="reset_filter"
-          apply="apply_filter"
-          filter={@filter}/>
+          change="change_search"
+          reset="reset_search"
+          apply="apply_search"
+          query={@query}/>
 
         <Link class="btn btn-primary" to={Routes.live_path(@socket, New)}>
           Create Community
         </Link>
       </div>
       <div id="community-filters" class="p-3">
-        <Form for={:field_filter} change="apply_field_filter">
+        <Form for={:filter} change="apply_filter">
           <Field name={:status} class="form-group">
-            <Checkbox value={Map.get(@field_filter, "status", "active")} checked_value="active" unchecked_value="active,deleted" class="form-check-input"/>
+            <Checkbox value={Map.get(@filter, "status", "active")} checked_value="active" unchecked_value="active,deleted" class="form-check-input"/>
             <Label class="form-check-label" text="Show only active communities"/>
           </Field>
         </Form>
@@ -93,7 +93,7 @@ defmodule OliWeb.CommunityLive.Index do
 
       <div id="communities-table" class="p-4">
         <Listing
-          filter={@filter}
+          filter={@query}
           table_model={@table_model}
           total_count={@total_count}
           offset={@offset}
