@@ -136,10 +136,10 @@ defmodule OliWeb.Common.SortableTable.TableHandlers do
             _ -> 0
           end
 
-        query = Params.get_str_param(params, "query", "")
+        query = Params.get_param(params, "query", "")
 
         filter =
-          Params.get_str_param(
+          Params.get_param(
             params,
             "filter",
             Map.get(socket.assigns, :filter, %{})
