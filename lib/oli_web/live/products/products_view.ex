@@ -26,10 +26,10 @@ defmodule OliWeb.Products.ProductsView do
   data filter, :string, default: ""
   data applied_filter, :string, default: ""
 
-  @table_filter_fn &OliWeb.Products.ProductsView.filter_rows/2
+  @table_filter_fn &OliWeb.Products.ProductsView.filter_rows/3
   @table_push_patch_path &OliWeb.Products.ProductsView.live_path/2
 
-  def filter_rows(socket, filter) do
+  def filter_rows(socket, filter, _field_filter) do
     case String.downcase(filter) do
       "" ->
         socket.assigns.products

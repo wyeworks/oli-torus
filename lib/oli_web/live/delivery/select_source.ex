@@ -21,7 +21,7 @@ defmodule OliWeb.Delivery.SelectSource do
   data filter, :string, default: ""
   data applied_filter, :string, default: ""
 
-  @table_filter_fn &OliWeb.Delivery.SelectSource.filter_rows/2
+  @table_filter_fn &OliWeb.Delivery.SelectSource.filter_rows/3
   @table_push_patch_path &OliWeb.Delivery.SelectSource.live_path/2
 
   def breadcrumb(previous) do
@@ -34,7 +34,7 @@ defmodule OliWeb.Delivery.SelectSource do
       ]
   end
 
-  def filter_rows(socket, filter) do
+  def filter_rows(socket, filter, _field_filter) do
     case String.downcase(filter) do
       "" ->
         socket.assigns.sources

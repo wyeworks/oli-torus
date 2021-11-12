@@ -7,13 +7,14 @@ defmodule OliWeb.CommunityLive.Index do
   alias OliWeb.Common.{Breadcrumb, Filter, Listing}
   alias OliWeb.CommunityLive.{New, TableModel}
   alias OliWeb.Router.Helpers, as: Routes
-  alias Surface.Components.Form.{Checkbox, Label}
+  alias Surface.Components.Form
+  alias Surface.Components.Form.{Checkbox, Field, Label}
   alias Surface.Components.Link
 
   data(title, :string, default: "Communities")
   data(breadcrumbs, :any)
-  data(show_deleted, :boolean, default: false)
 
+  data(field_filter, :any, default: %{"status" => "active"})
   data(filter, :string, default: "")
   data(total_count, :integer, default: 0)
   data(offset, :integer, default: 0)
@@ -23,19 +24,22 @@ defmodule OliWeb.CommunityLive.Index do
   data(show_bottom_paging, :boolean, default: false)
   data(additional_table_class, :string, default: "")
 
-  @table_filter_fn &__MODULE__.filter_rows/2
+  @table_filter_fn &__MODULE__.filter_rows/3
   @table_push_patch_path &__MODULE__.live_path/2
 
-  def filter_rows(socket, filter) do
-    case String.downcase(filter) do
-      "" ->
-        socket.assigns.communities
+  def filter_rows(socket, filter, field_filter) do
+    field_filter =
+      Enum.reduce(field_filter, %{}, fn {field, value}, acc ->
+        Map.put(acc, field, String.split(value, ","))
+      end)
 
-      str ->
-        Enum.filter(socket.assigns.communities, fn c ->
-          String.contains?(String.downcase(c.name), str)
-        end)
-    end
+    filter_str = String.downcase(filter)
+    status_list = field_filter["status"]
+
+    Enum.filter(socket.assigns.communities, fn c ->
+      String.contains?(String.downcase(c.name), filter_str) and
+        Enum.member?(status_list, Atom.to_string(c.status))
+    end)
   end
 
   def live_path(socket, params) do
@@ -53,7 +57,7 @@ defmodule OliWeb.CommunityLive.Index do
   end
 
   def mount(_, _, socket) do
-    communities = Groups.search_communities(%{status: :active})
+    communities = Groups.list_communities()
     {:ok, table_model} = TableModel.new(communities)
 
     {:ok,
@@ -78,11 +82,13 @@ defmodule OliWeb.CommunityLive.Index do
           Create Community
         </Link>
       </div>
-      <div class="p-3">
-        <div class="input-group" style="padding-left: 1.5rem">
-          <Checkbox click="toggle_status" value={@show_deleted} class="form-check-input"/>
-          <Label class="form-check-label" text="Show deleted communities"/>
-        </div>
+      <div id="community-filters" class="p-3">
+        <Form for={:field_filter} change="apply_field_filter">
+          <Field name={:status} class="form-group">
+            <Checkbox value={Map.get(@field_filter, "status", "active")} checked_value="active" unchecked_value="active,deleted" class="form-check-input"/>
+            <Label class="form-check-label" text="Show only active communities"/>
+          </Field>
+        </Form>
       </div>
 
       <div id="communities-table" class="p-4">
@@ -98,29 +104,5 @@ defmodule OliWeb.CommunityLive.Index do
           additional_table_class={@additional_table_class}/>
       </div>
     """
-  end
-
-  def handle_event("toggle_status", _params, socket) do
-    show_deleted = !socket.assigns.show_deleted
-
-    communities =
-      if show_deleted do
-        Groups.list_communities()
-      else
-        Groups.search_communities(%{status: :active})
-      end
-
-    {:ok, table_model} = TableModel.new(communities)
-
-    socket =
-      assign(socket,
-        breadcrumbs: breadcrumb(),
-        communities: communities,
-        table_model: table_model,
-        total_count: length(communities),
-        show_deleted: show_deleted
-      )
-
-    {:noreply, socket}
   end
 end

@@ -27,7 +27,8 @@ defmodule OliWeb.Common.SortableTable.TableHandlers do
                get_patch_params(
                  socket.assigns.table_model,
                  socket.assigns.offset,
-                 socket.assigns.filter
+                 socket.assigns.filter,
+                 Map.get(socket.assigns, :field_filter, %{})
                )
              ),
            replace: true
@@ -43,7 +44,8 @@ defmodule OliWeb.Common.SortableTable.TableHandlers do
                get_patch_params(
                  socket.assigns.table_model,
                  socket.assigns.offset,
-                 ""
+                 "",
+                 Map.get(socket.assigns, :field_filter, %{})
                )
              ),
            replace: true
@@ -59,7 +61,8 @@ defmodule OliWeb.Common.SortableTable.TableHandlers do
                get_patch_params(
                  socket.assigns.table_model,
                  String.to_integer(offset),
-                 socket.assigns.applied_filter
+                 socket.assigns.applied_filter,
+                 Map.get(socket.assigns, :field_filter, %{})
                )
              ),
            replace: true
@@ -80,15 +83,43 @@ defmodule OliWeb.Common.SortableTable.TableHandlers do
            to:
              @table_push_patch_path.(
                socket,
-               get_patch_params(table_model, offset, socket.assigns.applied_filter)
+               get_patch_params(
+                 table_model,
+                 offset,
+                 socket.assigns.applied_filter,
+                 Map.get(socket.assigns, :field_filter, %{})
+               )
              ),
            replace: true
          )}
       end
 
-      defp get_patch_params(table_model, offset, filter) do
+      def handle_event(
+            "apply_field_filter",
+            params,
+            socket
+          ) do
+        field_filter = Map.get(params, "field_filter", socket.assigns.field_filter)
+
+        {:noreply,
+         push_patch(socket,
+           to:
+             @table_push_patch_path.(
+               socket,
+               get_patch_params(
+                 socket.assigns.table_model,
+                 socket.assigns.offset,
+                 socket.assigns.filter,
+                 field_filter
+               )
+             ),
+           replace: true
+         )}
+      end
+
+      defp get_patch_params(table_model, offset, filter, field_filter) do
         Map.merge(
-          %{"offset" => offset, "filter" => filter},
+          %{"offset" => offset, "filter" => filter, "field_filter" => field_filter},
           SortableTableModel.to_params(table_model)
         )
       end
@@ -107,10 +138,17 @@ defmodule OliWeb.Common.SortableTable.TableHandlers do
 
         filter = Params.get_str_param(params, "filter", "")
 
+        field_filter =
+          Params.get_str_param(
+            params,
+            "field_filter",
+            Map.get(socket.assigns, :field_filter, %{})
+          )
+
         # First update the rows of the sortable table model to be all products, then apply the sort,
         # then slice the model rows according to the paging settings
 
-        filtered = @table_filter_fn.(socket, filter)
+        filtered = @table_filter_fn.(socket, filter, field_filter)
 
         table_model =
           Map.put(socket.assigns.table_model, :rows, filtered)
@@ -129,6 +167,7 @@ defmodule OliWeb.Common.SortableTable.TableHandlers do
            offset: offset,
            applied_filter: filter,
            filter: filter,
+           field_filter: field_filter,
            total_count: length(filtered)
          )}
       end
