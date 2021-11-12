@@ -10,7 +10,7 @@ defmodule Oli.Plugs.CommunityAdmin do
       conn
     else
       conn
-      |> Phoenix.Controller.put_flash(:info, "You are not allowed to see this page")
+      |> Phoenix.Controller.put_flash(:info, "You are not allowed to access communities")
       |> Phoenix.Controller.redirect(
         to: Routes.live_path(OliWeb.Endpoint, OliWeb.Projects.ProjectsLive)
       )

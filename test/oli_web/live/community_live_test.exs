@@ -430,7 +430,7 @@ defmodule OliWeb.CommunityLiveTest do
       assert view
              |> element("div.alert.alert-danger")
              |> render() =~
-               "Community admin couldn&#39;t be added. Author is already an admin or an unexpected error occurred (check logs)."
+               "Community admin couldn&#39;t be added. Author is already an admin or an unexpected error occurred."
 
       view
       |> element("form[phx-submit=\"add_collaborator\"")
@@ -485,7 +485,7 @@ defmodule OliWeb.CommunityLiveTest do
       assert view
              |> element("div.alert.alert-danger")
              |> render() =~
-               "Community admin couldn&#39;t be removed. Check logs."
+               "Community admin couldn&#39;t be removed."
 
       assert 1 == length(Groups.list_community_admins(community.id))
     end

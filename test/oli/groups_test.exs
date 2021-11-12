@@ -130,10 +130,10 @@ defmodule Oli.GroupsTest do
       assert community_account.is_admin == params.is_admin
     end
 
-    test "create_community_account_from_author_email/1 for non existing author email returns not found" do
+    test "create_community_account_from_author_email/1 for non existing author email returns author not found" do
       params = params_for(:community_account)
 
-      assert {:error, :not_found} =
+      assert {:error, :author_not_found} =
                Groups.create_community_account_from_author_email("testing@email.com", params)
     end
 
@@ -175,7 +175,7 @@ defmodule Oli.GroupsTest do
       refute Groups.get_community_account(community_account.id)
     end
 
-    test "delete_community_account/1 fails when the community account does not exists" do
+    test "delete_community_account/1 fails when the community account does not exist" do
       community_account = insert(:community_account)
 
       assert {:error, :not_found} =
@@ -230,41 +230,6 @@ defmodule Oli.GroupsTest do
                        community_id: community_account.community_id
                      })
                    end
-    end
-
-    test "list_admin_communities/1 returns the communities for an admin" do
-      community_account = insert(:community_account)
-      insert(:community_account, %{author: community_account.author})
-      insert(:community_account, %{author: community_account.author, is_admin: false})
-
-      communties = Groups.list_admin_communities(community_account.author_id)
-
-      assert [%Community{} | _tail] = communties
-      assert 2 = length(communties)
-    end
-
-    test "list_community_accounts_by_account_id/1 returns a community account when the id exists" do
-      community_account = insert(:community_account)
-      insert(:community_account, %{author: community_account.author})
-
-      author_community_accounts =
-        Groups.list_community_accounts_by_account_id(community_account.author_id)
-
-      assert [%CommunityAccount{} | _tail] = author_community_accounts
-      assert 2 = length(author_community_accounts)
-
-      insert(:community_account)
-      insert(:community_account, %{user: community_account.user})
-
-      user_community_accounts =
-        Groups.list_community_accounts_by_account_id(community_account.user_id)
-
-      assert [%CommunityAccount{} | _tail] = user_community_accounts
-      assert 2 = length(user_community_accounts)
-    end
-
-    test "list_community_accounts_by_account_id/1 returns nil if the community account does not exist" do
-      assert [] == Groups.list_community_accounts_by_account_id(123)
     end
   end
 end

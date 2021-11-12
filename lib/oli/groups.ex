@@ -156,7 +156,7 @@ defmodule Oli.Groups do
         attrs |> Map.put(:author_id, id) |> create_community_account()
 
       _ ->
-        {:error, :not_found}
+        {:error, :author_not_found}
     end
   end
 
@@ -218,53 +218,11 @@ defmodule Oli.Groups do
     Repo.all(
       from(
         community_account in CommunityAccount,
-        join: author in Author,
-        on: community_account.author_id == author.id,
+        join: author in assoc(community_account, :author),
         where:
           community_account.community_id == ^community_id and community_account.is_admin == true,
         select: author
       )
     )
-  end
-
-  @doc """
-  Get all the communities for a specific admin.
-
-  ## Examples
-
-      iex> list_admin_communities(1)
-      {:ok, [%Community{}, ...]}
-
-      iex> list_admin_communities(123)
-      {:ok, []}
-  """
-  def list_admin_communities(author_id) do
-    Repo.all(
-      from(
-        community_account in CommunityAccount,
-        join: community in Community,
-        on: community_account.community_id == community.id,
-        where: community_account.author_id == ^author_id and community_account.is_admin == true,
-        select: community
-      )
-    )
-  end
-
-  @doc """
-  Get all the community accounts for a specific account (author or user).
-
-  ## Examples
-
-      iex> list_community_accounts_by_account_id(1)
-      {:ok, [%CommunityAccount{}, ...]}
-
-      iex> list_community_accounts_by_account_id(123)
-      {:ok, []}
-  """
-  def list_community_accounts_by_account_id(account_id) do
-    CommunityAccount
-    |> where(author_id: ^account_id)
-    |> or_where(user_id: ^account_id)
-    |> Repo.all()
   end
 end

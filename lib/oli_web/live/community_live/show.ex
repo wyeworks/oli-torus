@@ -3,7 +3,6 @@ defmodule OliWeb.CommunityLive.Show do
   use OliWeb.Common.Modal
 
   alias Oli.Groups
-  alias Oli.Groups.Community
   alias OliWeb.Common.{Breadcrumb, DeleteModalComponent}
 
   alias OliWeb.CommunityLive.{
@@ -47,11 +46,13 @@ defmodule OliWeb.CommunityLive.Show do
 
         community ->
           changeset = Groups.change_community(community)
+          community_admins = Groups.list_community_admins(community_id)
 
           assign(socket,
             community: community,
             changeset: changeset,
-            breadcrumbs: breadcrumb(community_id)
+            breadcrumbs: breadcrumb(community_id),
+            community_admins: community_admins
           )
       end
 
@@ -177,13 +178,11 @@ defmodule OliWeb.CommunityLive.Show do
       {:error, error} ->
         message =
           case error do
-            :not_found ->
+            :author_not_found ->
               "Community admin couldn't be added. Author does not exist."
 
-            _ ->
-              Logger.error("Community admin failed to be added: #{inspect(error)}")
-
-              "Community admin couldn't be added. Author is already an admin or an unexpected error occurred (check logs)."
+            %Ecto.Changeset{} ->
+              "Community admin couldn't be added. Author is already an admin or an unexpected error occurred."
           end
 
         {:noreply, put_flash(socket, :error, message)}
@@ -205,10 +204,8 @@ defmodule OliWeb.CommunityLive.Show do
 
         {:noreply, assign(socket, community_admins: community_admins)}
 
-      {:error, error} ->
-        Logger.error("Community admin failed to be removed: #{inspect(error)}")
-
-        {:noreply, put_flash(socket, :error, "Community admin couldn't be removed. Check logs.")}
+      {:error, _error} ->
+        {:noreply, put_flash(socket, :error, "Community admin couldn't be removed.")}
     end
   end
 end

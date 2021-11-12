@@ -2,6 +2,7 @@ defmodule OliWeb.CommunityLive.Index do
   use Surface.LiveView, layout: {OliWeb.LayoutView, "live.html"}
   use OliWeb.Common.SortableTable.TableHandlers
 
+  alias Oli.Accounts
   alias Oli.Groups
   alias OliWeb.Admin.AdminView
   alias OliWeb.Common.{Breadcrumb, Filter, Listing}
@@ -58,14 +59,14 @@ defmodule OliWeb.CommunityLive.Index do
 
   def mount(
         _,
-        %{"is_community_admin" => is_community_admin, "current_author_id" => author_id},
+        %{"is_system_admin" => is_system_admin, "current_author_id" => author_id},
         socket
       ) do
     communities =
-      if is_community_admin do
-        Groups.list_admin_communities(author_id)
-      else
+      if is_system_admin do
         Groups.list_communities()
+      else
+        Accounts.list_admin_communities(author_id)
       end
 
     {:ok, table_model} = TableModel.new(communities)
@@ -76,7 +77,7 @@ defmodule OliWeb.CommunityLive.Index do
        communities: communities,
        table_model: table_model,
        total_count: length(communities),
-       is_community_admin: is_community_admin
+       is_system_admin: is_system_admin
      )}
   end
 
@@ -89,7 +90,7 @@ defmodule OliWeb.CommunityLive.Index do
           apply="apply_search"
           query={@query}/>
 
-        {#if not @is_community_admin}
+        {#if @is_system_admin}
           <Link class="btn btn-primary" to={Routes.live_path(@socket, New)}>
             Create Community
           </Link>
