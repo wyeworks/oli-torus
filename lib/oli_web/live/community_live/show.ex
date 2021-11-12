@@ -3,6 +3,7 @@ defmodule OliWeb.CommunityLive.Show do
   use OliWeb.Common.Modal
 
   alias Oli.Groups
+  alias Oli.Groups.Community
   alias OliWeb.Common.{Breadcrumb, DeleteModalComponent}
   alias OliWeb.CommunityLive.{FormComponent, Index, ShowSectionComponent}
   alias OliWeb.Router.Helpers, as: Routes
@@ -30,20 +31,25 @@ defmodule OliWeb.CommunityLive.Show do
 
   def mount(%{"community_id" => community_id}, _session, socket) do
     socket =
-      case Groups.get_community(community_id) do
+      with %Community{status: status} = community <- Groups.get_community(community_id),
+           "active" <- Atom.to_string(status) do
+        changeset = Groups.change_community(community)
+
+        assign(socket,
+          community: community,
+          changeset: changeset,
+          breadcrumbs: breadcrumb(community_id)
+        )
+      else
         nil ->
           socket
           |> put_flash(:info, "That community does not exist.")
           |> push_redirect(to: Routes.live_path(OliWeb.Endpoint, Index))
 
-        community ->
-          changeset = Groups.change_community(community)
-
-          assign(socket,
-            community: community,
-            changeset: changeset,
-            breadcrumbs: breadcrumb(community_id)
-          )
+        status ->
+          socket
+          |> put_flash(:info, "You don't have access to that community because it is #{status}.")
+          |> push_redirect(to: Routes.live_path(OliWeb.Endpoint, Index))
       end
 
     {:ok, socket}
