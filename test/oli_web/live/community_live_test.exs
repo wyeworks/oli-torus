@@ -80,15 +80,34 @@ defmodule OliWeb.CommunityLiveTest do
       assert has_element?(view, "a[href=\"#{@live_view_index_route}/new\"]")
     end
 
-    test "lists all communities", %{conn: conn} do
+    test "lists only active communities", %{conn: conn} do
       c1 = insert(:community)
       c2 = insert(:community)
+      c3 = insert(:community, status: :deleted)
 
       {:ok, view, _html} = live(conn, @live_view_index_route)
 
       assert has_element?(view, "#communities-table")
       assert has_element?(view, "##{c1.id}")
       assert has_element?(view, "##{c2.id}")
+      refute has_element?(view, "##{c3.id}")
+    end
+
+    test "lists all communities when filter is applied", %{conn: conn} do
+      c1 = insert(:community)
+      c2 = insert(:community)
+      c3 = insert(:community, status: :deleted)
+
+      {:ok, view, _html} = live(conn, @live_view_index_route)
+
+      view
+      |> element("#community-filters form")
+      |> render_change(%{"filter" => %{"status" => "active,deleted"}})
+
+      assert has_element?(view, "#communities-table")
+      assert has_element?(view, "##{c1.id}")
+      assert has_element?(view, "##{c2.id}")
+      assert has_element?(view, "##{c3.id}")
     end
 
     test "applies filtering", %{conn: conn} do
@@ -208,6 +227,12 @@ defmodule OliWeb.CommunityLiveTest do
   describe "show" do
     setup [:admin_conn, :create_community]
 
+    defp render_delete_modal(view) do
+      view
+      |> element("button[phx-click=\"show_delete_community_modal\"]")
+      |> render_click()
+    end
+
     test "loads correctly with community data", %{conn: conn, community: community} do
       {:ok, view, _html} = live(conn, live_view_show_route(community.id))
 
@@ -276,6 +301,91 @@ defmodule OliWeb.CommunityLiveTest do
 
       assert conn.resp_body =~ ~r/You are being.*redirected/
       assert conn.resp_body =~ "href=\"#{@live_view_index_route}\""
+    end
+
+    test "redirects to index view and displays error message when community has deleted status",
+         %{
+           conn: conn
+         } do
+      %Community{id: id} = insert(:community, status: :deleted)
+
+      conn = get(conn, live_view_show_route(id))
+
+      assert conn.private.plug_session["phoenix_flash"]["info"] ==
+               "You don't have access to that community because it is deleted."
+
+      assert conn.resp_body =~ ~r/You are being.*redirected/
+      assert conn.resp_body =~ "href=\"#{@live_view_index_route}\""
+    end
+
+    test "displays a confirm modal before deleting a community", %{
+      conn: conn,
+      community: %Community{id: id}
+    } do
+      {:ok, view, _html} = live(conn, live_view_show_route(id))
+
+      render_delete_modal(view)
+
+      assert view
+             |> element("#delete_community_modal h5.modal-title")
+             |> render() =~
+               "Are you absolutely sure?"
+    end
+
+    test "does not allow deleting the community if names do not match", %{
+      conn: conn,
+      community: %Community{id: id}
+    } do
+      {:ok, view, _html} = live(conn, live_view_show_route(id))
+
+      render_delete_modal(view)
+
+      view
+      |> element("#delete_community_modal form")
+      |> render_change(%{"community" => %{"name" => "invalid name"}})
+
+      assert view
+             |> element("#delete_community_modal form button")
+             |> render() =~
+               "disabled"
+    end
+
+    test "allows deleting the community if names match", %{
+      conn: conn,
+      community: %Community{id: id, name: name}
+    } do
+      {:ok, view, _html} = live(conn, live_view_show_route(id))
+
+      render_delete_modal(view)
+
+      view
+      |> element("#delete_community_modal form")
+      |> render_change(%{"community" => %{"name" => name}})
+
+      refute view
+             |> element("#delete_community_modal form button")
+             |> render() =~
+               "disabled"
+    end
+
+    test "deletes the community and redirects to the index page", %{
+      conn: conn,
+      community: %Community{id: id, name: name}
+    } do
+      {:ok, view, _html} = live(conn, live_view_show_route(id))
+
+      render_delete_modal(view)
+
+      view
+      |> element("#delete_community_modal form")
+      |> render_submit(%{"community" => %{"name" => name}})
+
+      flash = assert_redirected(view, @live_view_index_route)
+      assert flash["info"] == "Community successfully deleted."
+
+      %Community{status: status} = Groups.get_community(id)
+
+      assert status == :deleted
     end
   end
 end
