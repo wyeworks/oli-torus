@@ -4,13 +4,13 @@ defmodule OliWeb.Common.DeleteModalComponent do
   alias Surface.Components.Form
   alias Surface.Components.Form.{Field, TextInput}
 
-  prop(id, :string, required: true)
-  prop(description, :string, required: true)
-  prop(entity_name, :string, required: true)
-  prop(entity_type, :string, required: true)
-  prop(delete_enabled, :boolean, required: true)
-  prop(validate, :event, required: true)
-  prop(delete, :event, required: true)
+  prop id, :string, required: true
+  prop description, :string, required: true
+  prop entity_name, :string, required: true
+  prop entity_type, :string, required: true
+  prop delete_enabled, :boolean, required: true
+  prop validate, :event, required: true
+  prop delete, :event, required: true
 
   def render(assigns) do
     ~F"""

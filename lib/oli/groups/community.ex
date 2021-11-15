@@ -3,11 +3,11 @@ defmodule Oli.Groups.Community do
   import Ecto.Changeset
 
   schema "communities" do
-    field(:name, :string)
-    field(:description, :string)
-    field(:key_contact, :string)
-    field(:global_access, :boolean, default: true)
-    field(:status, Ecto.Enum, values: [:active, :deleted], default: :active)
+    field :name, :string
+    field :description, :string
+    field :key_contact, :string
+    field :global_access, :boolean, default: true
+    field :status, Ecto.Enum, values: [:active, :deleted], default: :active
 
     timestamps(type: :utc_datetime)
   end

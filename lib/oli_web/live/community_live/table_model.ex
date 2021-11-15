@@ -40,14 +40,14 @@ defmodule OliWeb.CommunityLive.TableModel do
     )
   end
 
-  def render_overview_button(assigns, %Community{id: community_id}, _) do
-    route_path = Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.Show, community_id)
+  def render_overview_button(assigns, %Community{id: id, status: status}, _) do
+    route_path = Routes.live_path(OliWeb.Endpoint, OliWeb.CommunityLive.Show, id)
 
     SortableTableModel.render_link_column(
       assigns,
       "Overview",
       route_path,
-      "btn btn-sm btn-primary"
+      "btn btn-sm btn-primary #{if status == :deleted, do: "disabled"}"
     )
   end
 

@@ -8,11 +8,11 @@ defmodule OliWeb.CommunityLive.Show do
   alias OliWeb.CommunityLive.{FormComponent, Index, ShowSectionComponent}
   alias OliWeb.Router.Helpers, as: Routes
 
-  data(title, :string, default: "Edit Community")
-  data(community, :struct)
-  data(changeset, :changeset)
-  data(breadcrumbs, :list)
-  data(modal, :any, default: nil)
+  data title, :string, default: "Edit Community"
+  data community, :struct
+  data changeset, :changeset
+  data breadcrumbs, :list
+  data modal, :any, default: nil
 
   @delete_modal_description """
     This action will not affect existing course sections that are using this community.
@@ -31,25 +31,20 @@ defmodule OliWeb.CommunityLive.Show do
 
   def mount(%{"community_id" => community_id}, _session, socket) do
     socket =
-      with %Community{status: status} = community <- Groups.get_community(community_id),
-           "active" <- Atom.to_string(status) do
-        changeset = Groups.change_community(community)
-
-        assign(socket,
-          community: community,
-          changeset: changeset,
-          breadcrumbs: breadcrumb(community_id)
-        )
-      else
+      case Groups.get_community(community_id) do
         nil ->
           socket
-          |> put_flash(:info, "That community does not exist.")
+          |> put_flash(:info, "That community does not exist or it was deleted.")
           |> push_redirect(to: Routes.live_path(OliWeb.Endpoint, Index))
 
-        status ->
-          socket
-          |> put_flash(:info, "You don't have access to that community because it is #{status}.")
-          |> push_redirect(to: Routes.live_path(OliWeb.Endpoint, Index))
+        community ->
+          changeset = Groups.change_community(community)
+
+          assign(socket,
+            community: community,
+            changeset: changeset,
+            breadcrumbs: breadcrumb(community_id)
+          )
       end
 
     {:ok, socket}
@@ -64,7 +59,7 @@ defmodule OliWeb.CommunityLive.Show do
         </ShowSectionComponent>
         <ShowSectionComponent section_title="Actions">
           <div class="d-flex align-items-center">
-            <button type="button" class="btn btn-link text-danger action-button" :on-click="show_delete_community_modal">Delete</button>
+            <button type="button" class="btn btn-link text-danger action-button" :on-click="show_delete_modal">Delete</button>
             <span>Permanently delete this community.</span>
           </div>
         </ShowSectionComponent>
@@ -111,7 +106,7 @@ defmodule OliWeb.CommunityLive.Show do
     {:noreply, socket |> hide_modal()}
   end
 
-  def handle_event("validate_name", %{"community" => %{"name" => name}}, socket) do
+  def handle_event("validate_name_for_deletion", %{"community" => %{"name" => name}}, socket) do
     delete_enabled = name == socket.assigns.community.name
     %{modal: modal} = socket.assigns
 
@@ -126,7 +121,7 @@ defmodule OliWeb.CommunityLive.Show do
     {:noreply, assign(socket, modal: modal)}
   end
 
-  def handle_event("show_delete_community_modal", _, socket) do
+  def handle_event("show_delete_modal", _, socket) do
     modal = %{
       component: DeleteModalComponent,
       assigns: %{
@@ -135,7 +130,7 @@ defmodule OliWeb.CommunityLive.Show do
         entity_name: socket.assigns.community.name,
         entity_type: "community",
         delete_enabled: false,
-        validate: "validate_name",
+        validate: "validate_name_for_deletion",
         delete: "delete"
       }
     }

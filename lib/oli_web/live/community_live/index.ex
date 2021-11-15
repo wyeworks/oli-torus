@@ -11,18 +11,18 @@ defmodule OliWeb.CommunityLive.Index do
   alias Surface.Components.Form.{Checkbox, Field, Label}
   alias Surface.Components.Link
 
-  data(title, :string, default: "Communities")
-  data(breadcrumbs, :any)
+  data title, :string, default: "Communities"
+  data breadcrumbs, :any
 
-  data(filter, :any, default: %{"status" => "active"})
-  data(query, :string, default: "")
-  data(total_count, :integer, default: 0)
-  data(offset, :integer, default: 0)
-  data(limit, :integer, default: 20)
-  data(sort, :string, default: "sort")
-  data(page_change, :string, default: "page_change")
-  data(show_bottom_paging, :boolean, default: false)
-  data(additional_table_class, :string, default: "")
+  data filter, :any, default: %{"status" => "active"}
+  data query, :string, default: ""
+  data total_count, :integer, default: 0
+  data offset, :integer, default: 0
+  data limit, :integer, default: 20
+  data sort, :string, default: "sort"
+  data page_change, :string, default: "page_change"
+  data show_bottom_paging, :boolean, default: false
+  data additional_table_class, :string, default: ""
 
   @table_filter_fn &__MODULE__.filter_rows/3
   @table_push_patch_path &__MODULE__.live_path/2
@@ -83,7 +83,7 @@ defmodule OliWeb.CommunityLive.Index do
         </Link>
       </div>
       <div id="community-filters" class="p-3">
-        <Form for={:filter} change="apply_filter">
+        <Form for={:filter} change="apply_filter" class="pl-4">
           <Field name={:status} class="form-group">
             <Checkbox value={Map.get(@filter, "status", "active")} checked_value="active" unchecked_value="active,deleted" class="form-check-input"/>
             <Label class="form-check-label" text="Show only active communities"/>

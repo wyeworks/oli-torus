@@ -1,9 +1,9 @@
 defmodule OliWeb.CommunityLive.ShowSectionComponent do
   use Surface.Component
 
-  prop(section_title, :string, required: true)
-  prop(section_description, :string)
-  slot(default, required: true)
+  prop section_title, :string, required: true
+  prop section_description, :string
+  slot default, required: true
 
   def render(assigns) do
     ~F"""

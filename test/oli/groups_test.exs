@@ -34,7 +34,7 @@ defmodule Oli.GroupsTest do
       assert 3 = length(Groups.list_communities())
     end
 
-    test "get_community/1 returns a community when the id exists" do
+    test "get_community/1 returns a community when the id exists and it is active" do
       community = insert(:community)
 
       returned_community = Groups.get_community(community.id)
@@ -45,6 +45,12 @@ defmodule Oli.GroupsTest do
 
     test "get_community/1 returns nil if the community does not exist" do
       assert nil == Groups.get_community(123)
+    end
+
+    test "get_community/1 returns nil if the community is not active" do
+      community = insert(:community, status: :deleted)
+
+      assert nil == Groups.get_community(community.id)
     end
 
     test "update_community/2 updates the community successfully" do
@@ -80,7 +86,7 @@ defmodule Oli.GroupsTest do
 
     test "search_communities/1 returns all communities meeting the criteria" do
       active_communities = insert_pair(:community, status: :active)
-      _deleted_community = insert(:community, status: :deleted)
+      insert(:community, status: :deleted)
 
       returned_communities = Groups.search_communities(%{status: :active})
 

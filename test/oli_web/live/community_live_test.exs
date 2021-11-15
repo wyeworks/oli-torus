@@ -82,21 +82,18 @@ defmodule OliWeb.CommunityLiveTest do
 
     test "lists only active communities", %{conn: conn} do
       c1 = insert(:community)
-      c2 = insert(:community)
-      c3 = insert(:community, status: :deleted)
+      c2 = insert(:community, status: :deleted)
 
       {:ok, view, _html} = live(conn, @live_view_index_route)
 
       assert has_element?(view, "#communities-table")
       assert has_element?(view, "##{c1.id}")
-      assert has_element?(view, "##{c2.id}")
-      refute has_element?(view, "##{c3.id}")
+      refute has_element?(view, "##{c2.id}")
     end
 
     test "lists all communities when filter is applied", %{conn: conn} do
       c1 = insert(:community)
-      c2 = insert(:community)
-      c3 = insert(:community, status: :deleted)
+      c2 = insert(:community, status: :deleted)
 
       {:ok, view, _html} = live(conn, @live_view_index_route)
 
@@ -107,7 +104,6 @@ defmodule OliWeb.CommunityLiveTest do
       assert has_element?(view, "#communities-table")
       assert has_element?(view, "##{c1.id}")
       assert has_element?(view, "##{c2.id}")
-      assert has_element?(view, "##{c3.id}")
     end
 
     test "applies filtering", %{conn: conn} do
@@ -229,7 +225,7 @@ defmodule OliWeb.CommunityLiveTest do
 
     defp render_delete_modal(view) do
       view
-      |> element("button[phx-click=\"show_delete_community_modal\"]")
+      |> element("button[phx-click=\"show_delete_modal\"]")
       |> render_click()
     end
 
@@ -297,7 +293,7 @@ defmodule OliWeb.CommunityLiveTest do
       conn = get(conn, live_view_show_route(1000))
 
       assert conn.private.plug_session["phoenix_flash"]["info"] ==
-               "That community does not exist."
+               "That community does not exist or it was deleted."
 
       assert conn.resp_body =~ ~r/You are being.*redirected/
       assert conn.resp_body =~ "href=\"#{@live_view_index_route}\""
@@ -312,7 +308,7 @@ defmodule OliWeb.CommunityLiveTest do
       conn = get(conn, live_view_show_route(id))
 
       assert conn.private.plug_session["phoenix_flash"]["info"] ==
-               "You don't have access to that community because it is deleted."
+               "That community does not exist or it was deleted."
 
       assert conn.resp_body =~ ~r/You are being.*redirected/
       assert conn.resp_body =~ "href=\"#{@live_view_index_route}\""
@@ -383,9 +379,7 @@ defmodule OliWeb.CommunityLiveTest do
       flash = assert_redirected(view, @live_view_index_route)
       assert flash["info"] == "Community successfully deleted."
 
-      %Community{status: status} = Groups.get_community(id)
-
-      assert status == :deleted
+      assert nil == Groups.get_community(id)
     end
   end
 end

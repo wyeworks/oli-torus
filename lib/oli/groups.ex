@@ -31,12 +31,7 @@ defmodule Oli.Groups do
       []
   """
   def search_communities(filter) do
-    conditions =
-      Enum.reduce(filter, false, fn {field, value}, conditions ->
-        dynamic([c], field(c, ^field) == ^value or ^conditions)
-      end)
-
-    from(c in Community, where: ^conditions)
+    from(c in Community, where: ^filter_conditions(filter))
     |> Repo.all()
   end
 
@@ -68,7 +63,7 @@ defmodule Oli.Groups do
       iex> get_community(123)
       nil
   """
-  def get_community(id), do: Repo.get(Community, id)
+  def get_community(id), do: Repo.get_by(Community, %{id: id, status: :active})
 
   @doc """
   Updates a community.
@@ -113,5 +108,11 @@ defmodule Oli.Groups do
   """
   def change_community(%Community{} = community, attrs \\ %{}) do
     Community.changeset(community, attrs)
+  end
+
+  defp filter_conditions(filter) do
+    Enum.reduce(filter, false, fn {field, value}, conditions ->
+      dynamic([entity], field(entity, ^field) == ^value or ^conditions)
+    end)
   end
 end

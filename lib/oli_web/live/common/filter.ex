@@ -1,10 +1,10 @@
 defmodule OliWeb.Common.Filter do
   use Surface.Component
 
-  prop(change, :event, required: true)
-  prop(apply, :event, required: true)
-  prop(reset, :event, required: true)
-  prop(query, :string)
+  prop change, :event, required: true
+  prop apply, :event, required: true
+  prop reset, :event, required: true
+  prop query, :string
 
   def render(assigns) do
     ~F"""
