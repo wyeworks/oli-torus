@@ -48,13 +48,12 @@ defmodule OliWeb.CommunityLive.Index do
   end
 
   def breadcrumb() do
-    AdminView.breadcrumb() ++
-      [
-        Breadcrumb.new(%{
-          full_title: "Communities",
-          link: Routes.live_path(OliWeb.Endpoint, __MODULE__)
-        })
-      ]
+    [
+      Breadcrumb.new(%{
+        full_title: "Communities",
+        link: Routes.live_path(OliWeb.Endpoint, __MODULE__)
+      })
+    ]
   end
 
   def mount(
