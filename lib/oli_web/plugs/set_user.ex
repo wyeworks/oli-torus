@@ -23,7 +23,8 @@ defmodule Oli.Plugs.SetCurrentUser do
       cond do
         current_author = Repo.get(Author, author.id) ->
           is_community_admin =
-            Accounts.list_admin_communities(current_author.id)
+            current_author.id
+            |> Accounts.list_admin_communities()
             |> Enum.empty?() ==
               false
 

@@ -197,11 +197,11 @@ defmodule Oli.GroupsTest do
       assert 2 = length(admins)
     end
 
-    test "get_community_account_by/1 returns a community account when meets the clauses" do
+    test "get_community_account_by!/1 returns a community account when meets the clauses" do
       community_account = insert(:community_account)
 
       returned_community_account =
-        Groups.get_community_account_by(%{
+        Groups.get_community_account_by!(%{
           community_id: community_account.community_id,
           author_id: community_account.author_id
         })
@@ -211,22 +211,22 @@ defmodule Oli.GroupsTest do
       assert community_account.community_id == returned_community_account.community_id
     end
 
-    test "get_community_account_by/1 returns nil if the community account does not exist" do
+    test "get_community_account_by!/1 returns nil if the community account does not exist" do
       assert nil ==
-               Groups.get_community_account_by(%{
+               Groups.get_community_account_by!(%{
                  community_id: 1,
                  author_id: 2
                })
     end
 
-    test "get_community_account_by/1 returns error if more than one meets the requirements" do
+    test "get_community_account_by!/1 returns error if more than one meets the requirements" do
       community_account = insert(:community_account)
       insert(:community_account, %{community: community_account.community})
 
       assert_raise Ecto.MultipleResultsError,
                    ~r/^expected at most one result but got 2 in query/,
                    fn ->
-                     Groups.get_community_account_by(%{
+                     Groups.get_community_account_by!(%{
                        community_id: community_account.community_id
                      })
                    end

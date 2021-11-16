@@ -7,8 +7,7 @@ defmodule Oli.Groups do
 
   alias Oli.Accounts
   alias Oli.Accounts.Author
-  alias Oli.Groups.Community
-  alias Oli.Groups.CommunityAccount
+  alias Oli.Groups.{Community, CommunityAccount}
   alias Oli.Repo
 
   @doc """
@@ -155,7 +154,7 @@ defmodule Oli.Groups do
       %Author{id: id} ->
         attrs |> Map.put(:author_id, id) |> create_community_account()
 
-      _ ->
+      nil ->
         {:error, :author_not_found}
     end
   end
@@ -173,16 +172,19 @@ defmodule Oli.Groups do
   def get_community_account(id), do: Repo.get(CommunityAccount, id)
 
   @doc """
-  Gets a community account by clauses.
+  Gets a community account by clauses. Will raise an error if
+  more than one matches the criteria.
 
   ## Examples
 
-      iex> get_community_account_by(%{author_id: 1})
+      iex> get_community_account_by!(%{author_id: 1})
       %CommunityAccount{}
-      iex> get_community_account_by(%{author_id: 123})
+      iex> get_community_account_by!(%{author_id: 123})
       nil
+      iex> get_community_account_by!(%{author_id: 2})
+      Ecto.MultipleResultsError
   """
-  def get_community_account_by(clauses), do: Repo.get_by(CommunityAccount, clauses)
+  def get_community_account_by!(clauses), do: Repo.get_by(CommunityAccount, clauses)
 
   @doc """
   Deletes a community account.
@@ -197,7 +199,7 @@ defmodule Oli.Groups do
 
   """
   def delete_community_account(clauses) do
-    case get_community_account_by(clauses) do
+    case get_community_account_by!(clauses) do
       nil -> {:error, :not_found}
       community_account -> Repo.delete(community_account)
     end
