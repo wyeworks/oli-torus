@@ -198,6 +198,20 @@ config :oli, :footer,
   link_2_location: System.get_env("FOOTER_LINK_2_LOCATION", ""),
   link_2_text: System.get_env("FOOTER_LINK_2_TEXT", "")
 
+# Configure libcluster for horizontal scaling
+# Take into account that different strategies could use different config options
+config :libcluster,
+  topologies: [
+    oli: [
+      strategy:
+        Module.concat([System.get_env("LIBCLUSTER_STRATEGY", "ClusterEC2.Strategy.Tags")]),
+      config: [
+        ec2_tagname: System.get_env("LIBCLUSTER_EC2_STRATEGY_TAG_NAME", ""),
+        ec2_tagvalue: System.get_env("LIBCLUSTER_EC2_STRATEGY_TAG_VALUE", "")
+      ]
+    ]
+  ]
+
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix
