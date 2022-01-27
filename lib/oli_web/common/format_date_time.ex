@@ -92,15 +92,18 @@ defmodule OliWeb.Common.FormatDateTime do
   session timezone information is set and updated on the timezone api call every
   time a page is loaded.
   """
-  def maybe_localized_datetime(%DateTime{} = datetime, nil), do: datetime
+  def maybe_localized_datetime(datetime, nil), do: datetime
 
-  def maybe_localized_datetime(%DateTime{} = datetime, %SessionContext{local_tz: local_tz}),
+  def maybe_localized_datetime(datetime, %SessionContext{local_tz: local_tz}),
     do: maybe_localized_datetime(datetime, local_tz)
 
-  def maybe_localized_datetime(%DateTime{} = datetime, local_tz) when is_binary(local_tz) do
+  def maybe_localized_datetime(datetime, local_tz) when is_binary(local_tz) do
     # ensure timezone is a valid
     if Timex.Timezone.exists?(local_tz) do
-      {:localized, Timex.Timezone.convert(datetime, Timex.Timezone.get(local_tz, Timex.now()))}
+      case Timex.Timezone.convert(datetime, Timex.Timezone.get(local_tz, Timex.now())) do
+        {:error, _} -> "Invalid date"
+        converted_date -> {:localized, converted_date}
+      end
     else
       datetime
     end
@@ -139,12 +142,12 @@ defmodule OliWeb.Common.FormatDateTime do
 
   def format_datetime(nil, _opts), do: ""
 
-  def format_datetime({:localized, %DateTime{} = datetime}, opts) do
+  def format_datetime({:localized, datetime}, opts) do
     # default to showing no timezone if the datetime has been localized
     format_datetime(datetime, Keyword.put_new(opts, :show_timezone, false))
   end
 
-  def format_datetime(%DateTime{} = datetime, opts) do
+  def format_datetime(datetime, opts) do
     author = Keyword.get(opts, :author)
 
     precision =

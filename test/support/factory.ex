@@ -3,8 +3,9 @@ defmodule Oli.Factory do
 
   alias Oli.Accounts.{Author, User}
   alias Oli.Authoring.Course.{Family, Project, ProjectVisibility}
-  alias Oli.Delivery.Sections.{Section, SectionsProjectsPublications, SectionResource}
+  alias Oli.Delivery.Sections.{Enrollment, Section, SectionsProjectsPublications, SectionResource}
   alias Oli.Delivery.Gating.GatingCondition
+  alias Oli.Delivery.Paywall.Payment
   alias Oli.Groups.{Community, CommunityAccount, CommunityInstitution, CommunityVisibility}
   alias Oli.Institutions.Institution
   alias Oli.Publishing.{Publication, PublishedResource}
@@ -206,6 +207,25 @@ defmodule Oli.Factory do
       resource: insert(:resource),
       type: :schedule,
       data: %{end_datetime: end_date, start_datetime: start_date}
+    }
+  end
+
+  def enrollment_factory() do
+    %Enrollment{
+      section: insert(:section),
+      user: insert(:user)
+    }
+  end
+
+  def payment_factory() do
+    {:ok, application_date, _timezone} = DateTime.from_iso8601("2019-05-22 20:30:00Z")
+
+    %Payment{
+      section: insert(:section),
+      enrollment: insert(:enrollment),
+      provider_type: :stripe,
+      amount: Money.new(:USD, 25),
+      application_date: application_date
     }
   end
 end
