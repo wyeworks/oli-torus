@@ -978,7 +978,7 @@ defmodule OliWeb.CommunityLiveTest do
 
     test "applies paging", %{conn: conn, community: community} do
       [first_cv | tail] =
-        insert_list(21, :community_visibility, %{community: community}) |> Enum.sort()
+        insert_list(21, :community_visibility, %{community: community}) |> Enum.sort_by(& &1.id)
 
       last_cv = List.last(tail)
 
