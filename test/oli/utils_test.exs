@@ -27,8 +27,14 @@ defmodule Oli.UtilsTest do
       assert Utils.ensure_absolute_url("http://already-aboslute") == "http://already-aboslute"
       assert Utils.ensure_absolute_url("https://already-aboslute") == "https://already-aboslute"
 
-      assert Utils.ensure_absolute_url("https://already-aboslute:8080/keeps/path?and=all&params=true") ==
+      assert Utils.ensure_absolute_url(
                "https://already-aboslute:8080/keeps/path?and=all&params=true"
+             ) ==
+               "https://already-aboslute:8080/keeps/path?and=all&params=true"
+    end
+
+    test "returns an empty string when the input url is nil" do
+      assert Utils.ensure_absolute_url(nil) == ""
     end
   end
 end
