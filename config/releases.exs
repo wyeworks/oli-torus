@@ -159,8 +159,7 @@ config :oli, OliWeb.Endpoint,
     port: String.to_integer(System.get_env("PORT", "443"))
   ],
   secret_key_base: secret_key_base,
-  live_view: [signing_salt: live_view_salt],
-  force_ssl: [rewrite_on: [:x_forwarded_proto], hsts: true]
+  live_view: [signing_salt: live_view_salt]
 
 if System.get_env("SSL_CERT_PATH") && System.get_env("SSL_KEY_PATH") do
   config :oli, OliWeb.Endpoint,
