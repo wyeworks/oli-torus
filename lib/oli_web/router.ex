@@ -43,7 +43,6 @@ defmodule OliWeb.Router do
   pipeline :lti do
     plug(:fetch_session)
     plug(:fetch_flash)
-    plug(Oli.Plugs.SetCurrentUser)
     plug(:put_root_layout, {OliWeb.LayoutView, "lti.html"})
   end
 
@@ -646,7 +645,7 @@ defmodule OliWeb.Router do
 
   # LTI routes
   scope "/lti", OliWeb do
-    pipe_through([:lti, :www_url_form])
+    pipe_through([:lti, :www_url_form, :delivery, :authoring])
 
     post("/login", LtiController, :login)
     get("/login", LtiController, :login)
